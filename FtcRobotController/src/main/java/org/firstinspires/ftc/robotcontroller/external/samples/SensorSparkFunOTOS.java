@@ -70,6 +70,7 @@ public class SensorSparkFunOTOS extends LinearOpMode {
             // Update the telemetry on the driver station
             telemetry.update();
         }
+        return false;
     }
 
     private void configureOtos() {
