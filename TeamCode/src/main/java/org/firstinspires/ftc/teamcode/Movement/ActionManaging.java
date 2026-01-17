@@ -13,12 +13,12 @@ public class ActionManaging {
     private LinearOpMode opMode;
 
     // ----- New fields for RotateWheel management -----
-    private static final double[] ARTIFACT_POSITIONS = {0.0, 0.4, 0.8}; // 구조화된 값 (RotateWheel 위치)
+    private static final double[] ARTIFACT_POSITIONS = {0.5, 0.5+0.0772, 0.5-0.0772}; // 구조화된 값 (RotateWheel 위치)
     private int currentRotatePositionIndex = 0; // RotateWheel의 현재 위치 인덱스
 
-    public ActionManaging(DcMotor IntakeDc, DcMotor OuttakeDc, Servo lift, LinearOpMode opMode, Servo wheel) {
-        this.OuttakeDc = OuttakeDc;
-        this.IntakeDc = IntakeDc;
+    public ActionManaging(Servo lift, LinearOpMode opMode, Servo wheel) {
+//        this.OuttakeDc = OuttakeDc;
+//        this.IntakeDc = IntakeDc;
         this.lifting = lift;
         this.opMode = opMode;
         this.timer = new ElapsedTime();
@@ -84,20 +84,11 @@ public class ActionManaging {
         currentRotatePositionIndex = (currentRotatePositionIndex + 1) % ARTIFACT_POSITIONS.length;
         wheel.setPosition(ARTIFACT_POSITIONS[currentRotatePositionIndex]);
         sleepFor(0.3); // 서보 이동 시간 대기
-        opMode.telemetry.addData("RotateWheel", "Moved to: %.1f", ARTIFACT_POSITIONS[currentRotatePositionIndex]);
-        opMode.telemetry.addData("Next Scan Index", currentRotatePositionIndex);
-        opMode.telemetry.update();
     }
 
-    /**
-     * Moves the RotateWheel directly to a specific artifact position by index.
-     * @param index The index of the target position in ARTIFACT_POSITIONS.
-     */
     public void rotateToArtifactPosition(double value) {
         wheel.setPosition(value);
         sleepFor(0.3); // 서보 이동 시간 대기
-        opMode.telemetry.addData("RotateWheel", "Moved to: %.1d", value);
-        opMode.telemetry.update();
     }
 
     /**

@@ -7,10 +7,17 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.utils.Vector2d;
 
 public class IMU_Driving {
+    public static class Vector2d {
+        public double x;
+        public double y;
 
+        public Vector2d(double x, double y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
     public IMU_Driving(DcMotor fl, DcMotor fr, DcMotor rl, DcMotor rr, IMU imu, Telemetry telemetry, Gamepad gamepad1){
         this.fl = fl;
         this.fr = fr;
@@ -160,7 +167,7 @@ public class IMU_Driving {
     Vector2d getMovePower(){
         double x = gamepad1.left_stick_x;
         double y = -gamepad1.left_stick_y;
-        if(Math.abs(x) < 0.1 && Math.abs(y) < 0.1) return new Vector2d(0,0);
+        if(Math.abs(x) < 0.1 && Math.abs(y) < 0.1) return new Vector2d(0, 0);
         double radian = Math.toRadians(getYaw()); // 라디안 계산 때는 정방향 필요
 
         double a = x * Math.cos(radian) + y * Math.sin(radian);
@@ -169,7 +176,7 @@ public class IMU_Driving {
         if(Math.abs(a) < 0.00000025) a = 0;
         if(Math.abs(b) < 0.00000025) b = 0;
         telemetry.addData("move: ", a + "/" + b );
-        return new Vector2d(a,b);
+        return new Vector2d(a, b);
     }
 
 

@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
+import android.graphics.Color;
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -8,8 +10,9 @@ import com.qualcomm.robotcore.hardware.NormalizedColorSensor;
 import com.qualcomm.robotcore.hardware.NormalizedRGBA;
 import com.qualcomm.robotcore.hardware.Servo;
 
+import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.teamcode.Movement.ActionManaging;
-
+// Webcam 1
 @Configurable
 @TeleOp
 public class New_Sorting extends LinearOpMode {
@@ -21,8 +24,8 @@ public class New_Sorting extends LinearOpMode {
     private ActionManaging ActionManager;
 
     // 색 기준값
-    private static final float[] GREEN = new float[]{0.20f, 0.55f, 0.25f};
-    private static final float[] PURPLE = new float[]{0.40f, 0.25f, 0.45f};
+    public static final float[] GREEN = new float[]{0.20f, 0.55f, 0.25f};
+    public static final float[] PURPLE = new float[]{0.40f, 0.25f, 0.45f};
 
     // 파라미터
     private static final float COLOR_THRESHOLD = 0.20f; // ±20% 범위
@@ -33,10 +36,12 @@ public class New_Sorting extends LinearOpMode {
     private boolean isInfiniteSortingActive = false;
     private int colorSortIndex = 0;
     public double current_position = 0;
-    public double test1 = 0.0;
-    public double test2 = 0.4;
-    public double test3 = 0.8;
-
+    public static double test1 = 0.5-0.0772;
+    public static double test2 = 0.5;
+    public static double test3 = 0.5772;
+    final float[] hsv1 = new float[3];
+    final float[] hsv2 = new float[3];
+    final float[] hsv3 = new float[3];
     @Override
     public void runOpMode() {
         initHardware();
@@ -98,41 +103,70 @@ public class New_Sorting extends LinearOpMode {
                 }
             }
 
+            NormalizedRGBA c1c = c1.getNormalizedColors();
+            Color.colorToHSV(c1c.toColor(), hsv1);
+
+            NormalizedRGBA c2c = c2.getNormalizedColors();
+            Color.colorToHSV(c2c.toColor(), hsv2);
+
+            NormalizedRGBA c3c = c3.getNormalizedColors();
+            Color.colorToHSV(c3c.toColor(), hsv3);
+
+            // 120 None  140 G 180 P
+            // 0 None  1 G 0.5 P
+            telemetry.addData("C1", detectColorHSV(c1));
+            telemetry.addData("C2", detectColorHSV(c2));
+            telemetry.addData("C3", detectColorHSV(c3));
+            telemetry.addData("C1 h", hsv1[0]);
+            telemetry.addData("C1 s", hsv1[1]);
+            telemetry.addData("C1 v", hsv1[2]);
+
+            telemetry.addData("C2 h", hsv2[0]);
+            telemetry.addData("C2 s", hsv2[1]);
+            telemetry.addData("C2 v", hsv2[2]);
+
+            telemetry.addData("C3 h", hsv3[0]);
+            telemetry.addData("C3 s", hsv3[1]);
+            telemetry.addData("C3 v", hsv3[2]);
             // 상태 표시 (모터 파워 등은 ActionManager getter가 필요할 수 있으나, 여기선 단순 상태 표시만)
             telemetry.addData("Infinite Sorting", isInfiniteSortingActive ? "ACTIVE" : "INACTIVE");
+
             telemetry.update();
         }
     }
-
+// green saturation 0.7
+    // purple hue 200
     // ------------------------
 // 하드웨어 초기화
 // ------------------------
     private void initHardware() {
         // 하드웨어 맵핑
         Servo rotateWheel = hardwareMap.get(Servo.class, "RotateWheel");
-        DcMotor intakeWheel = hardwareMap.get(DcMotor.class, "IntakeWheel");
-        DcMotor outtakeWheel = hardwareMap.get(DcMotor.class, "OuttakeWheel");
+//        DcMotor intakeWheel = hardwareMap.get(DcMotor.class, "IntakeWheel");
+//        DcMotor outtakeWheel = hardwareMap.get(DcMotor.class, "OuttakeWheel");
         Servo LiftServo = hardwareMap.get(Servo.class, "LiftServo");
 
         c1 = hardwareMap.get(NormalizedColorSensor.class, "c1");
         c2 = hardwareMap.get(NormalizedColorSensor.class, "c2");
         c3 = hardwareMap.get(NormalizedColorSensor.class, "c3");
-
+        c1.setGain(8);
+        c2.setGain(8);
+        c3.setGain(8);
         // ActionManaging 초기화
-        ActionManager = new ActionManaging(intakeWheel, outtakeWheel, LiftServo, this, rotateWheel);
+        ActionManager = new ActionManaging(LiftServo, this, rotateWheel);
 
         // 하드웨어 설정 (방향 등)
-        intakeWheel.setDirection(DcMotor.Direction.FORWARD);
-        outtakeWheel.setDirection(DcMotor.Direction.REVERSE);
+//        intakeWheel.setDirection(DcMotor.Direction.FORWARD);
+//        outtakeWheel.setDirection(DcMotor.Direction.REVERSE);
         rotateWheel.setDirection(Servo.Direction.FORWARD);
         LiftServo.setDirection(Servo.Direction.FORWARD);
 
         // 초기 위치 설정
-        rotateWheel.setPosition(0.0);
+        rotateWheel.setPosition(0.5);
         LiftServo.setPosition(0.0);
 
-        intakeWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        outtakeWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        intakeWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+//        outtakeWheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     // ------------------------
@@ -180,19 +214,43 @@ public class New_Sorting extends LinearOpMode {
     // 색상 감지 여부를 판단하는 최적화된 메서드
     private boolean isTargetColor(NormalizedColorSensor sensor, String targetColor) {
         NormalizedRGBA colors = sensor.getNormalizedColors();
-        float[] targetRGB = targetColor.equals("Green") ? GREEN : PURPLE;
 
-        // 미리 계산된 범위 내에 있는지 확인 (연산 최소화)
-        // Red check
-        if (colors.red < targetRGB[0] * (1 - COLOR_THRESHOLD) || colors.red > targetRGB[0] * (1 + COLOR_THRESHOLD))
-            return false;
-        // Green check
-        if (colors.green < targetRGB[1] * (1 - COLOR_THRESHOLD) || colors.green > targetRGB[1] * (1 + COLOR_THRESHOLD))
-            return false;
-        // Blue check
-        if (colors.blue < targetRGB[2] * (1 - COLOR_THRESHOLD) || colors.blue >   targetRGB[2] * (1 + COLOR_THRESHOLD))
-            return false;
+        // HSV 변환
+        float[] hsv = new float[3];
+        Color.colorToHSV(colors.toColor(), hsv);
 
-        return true;
+        if (targetColor.equals("Green")) {
+            // 초록색: Saturation >= 0.7
+            return hsv[1] >= 0.6;
+        } else if (targetColor.equals("Purple")) {
+            // 보라색: Hue >= 200
+            return hsv[0] >= 180;
+        }
+
+        return false;
     }
+
+
+    private String detectColorHSV(NormalizedColorSensor sensor) {
+        NormalizedRGBA rgba = sensor.getNormalizedColors();
+
+        float[] hsv = new float[3];
+        Color.colorToHSV(rgba.toColor(), hsv);
+
+        float hue = hsv[0];        // 0 ~ 360
+        float saturation = hsv[1]; // 0 ~ 1
+
+        if (saturation >= 0.6) {
+            return "green";
+        }
+
+        // Purple 판별 (Hue 기준)
+        if (hue >= 180) {
+            return "purple";
+        }
+
+        return "none";
+    }
+
+
 }
