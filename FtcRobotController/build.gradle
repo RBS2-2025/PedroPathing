@@ -9,15 +9,15 @@ android {
 
     defaultConfig {
         minSdk 25
-        targetSdk 25
-//noinspection ExpiredTargetSdkVersion
+        targetSdk 35
+        //noinspection ExpiredTargetSdkVersion
         buildConfigField "String", "APP_BUILD_TIME", '"' + (new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ", Locale.ROOT).format(new Date())) + '"'
     }
 
     buildFeatures {
         buildConfig = true
     }
-    compileSdk 25
+    compileSdk 35
 
 
     compileOptions {
