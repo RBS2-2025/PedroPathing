@@ -22,6 +22,7 @@ public class New_Sorting extends LinearOpMode {
 
     // ActionManaging 객체
     private ActionManaging ActionManager;
+    public Servo rotateWheel,LiftServo;
 
     // 색 기준값
     public static final float[] GREEN = new float[]{0.20f, 0.55f, 0.25f};
@@ -35,10 +36,11 @@ public class New_Sorting extends LinearOpMode {
     // 무한 솔팅 제어 변수
     private boolean isInfiniteSortingActive = false;
     private int colorSortIndex = 0;
-    public double current_position = 0;
+    public double current_position = 0.5;
     public static double test1 = 0.5-0.0772;
     public static double test2 = 0.5;
     public static double test3 = 0.5772;
+    public static double step = 0.0772;
     final float[] hsv1 = new float[3];
     final float[] hsv2 = new float[3];
     final float[] hsv3 = new float[3];
@@ -65,8 +67,6 @@ public class New_Sorting extends LinearOpMode {
                 telemetry.update();
                 ActionManager.stopAll();
             }
-
-
 
             if (isInfiniteSortingActive) {
                 // 초록색과 보라색을 번갈아 가며 솔팅 (실제 Infinite Sorting 로직)
@@ -139,12 +139,12 @@ public class New_Sorting extends LinearOpMode {
     // ------------------------
 // 하드웨어 초기화
 // ------------------------
-    private void initHardware() {
+    public void initHardware() {
         // 하드웨어 맵핑
-        Servo rotateWheel = hardwareMap.get(Servo.class, "RotateWheel");
+        rotateWheel = hardwareMap.get(Servo.class, "RotateWheel");
 //        DcMotor intakeWheel = hardwareMap.get(DcMotor.class, "IntakeWheel");
 //        DcMotor outtakeWheel = hardwareMap.get(DcMotor.class, "OuttakeWheel");
-        Servo LiftServo = hardwareMap.get(Servo.class, "LiftServo");
+        LiftServo = hardwareMap.get(Servo.class, "LiftServo");
 
         c1 = hardwareMap.get(NormalizedColorSensor.class, "c1");
         c2 = hardwareMap.get(NormalizedColorSensor.class, "c2");
@@ -229,7 +229,25 @@ public class New_Sorting extends LinearOpMode {
 
         return false;
     }
+    private static final float[] GREEN_old = new float[]{0.20f, 0.55f, 0.25f};
+    private static final float[] PURPLE_old = new float[]{0.40f, 0.25f, 0.45f};
+    private boolean isTargetColor_dld(NormalizedColorSensor sensor, String targetColor) {
+        NormalizedRGBA colors = sensor.getNormalizedColors();
+        float[] targetRGB = targetColor.equals("Green") ? GREEN : PURPLE;
 
+        // 미리 계산된 범위 내에 있는지 확인 (연산 최소화)
+        // Red check
+        if (colors.red < targetRGB[0] * (1 - COLOR_THRESHOLD) || colors.red > targetRGB[0] * (1 + COLOR_THRESHOLD))
+            return false;
+        // Green check
+        if (colors.green < targetRGB[1] * (1 - COLOR_THRESHOLD) || colors.green > targetRGB[1] * (1 + COLOR_THRESHOLD))
+            return false;
+        // Blue check
+        if (colors.blue < targetRGB[2] * (1 - COLOR_THRESHOLD) || colors.blue >   targetRGB[2] * (1 + COLOR_THRESHOLD))
+            return false;
+
+        return true;
+    }
 
     private String detectColorHSV(NormalizedColorSensor sensor) {
         NormalizedRGBA rgba = sensor.getNormalizedColors();
@@ -244,7 +262,6 @@ public class New_Sorting extends LinearOpMode {
             return "green";
         }
 
-        // Purple 판별 (Hue 기준)
         if (hue >= 180) {
             return "purple";
         }
