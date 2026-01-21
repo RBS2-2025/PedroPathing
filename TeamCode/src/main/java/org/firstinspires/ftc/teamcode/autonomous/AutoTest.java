@@ -24,8 +24,10 @@ public class AutoTest extends OpMode {
     public Follower follower; // Pedro Pathing follower instance
     private int pathState = 0; // Current autonomous path state (state machine)
     private Paths paths; // Paths defined in the Paths class
-    private Timer pathTimer, waitTimer;
+    private Timer pathTimer;
     private Servo servo;
+
+    //골대 시작 각도: -36도(블루)
 
     private enum ServoState {
         IDLE,
@@ -39,14 +41,12 @@ public class AutoTest extends OpMode {
         panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(56, 136, Math.toRadians(270)));
+        follower.setStartingPose(new Pose(20, 122, Math.toRadians(135)));
 
         paths = new Paths(follower); // Build paths
 
         pathTimer = new Timer();
         pathTimer.resetTimer();
-        waitTimer = new Timer();
-        waitTimer.resetTimer();
 
         servo = hardwareMap.servo.get("servo");
         servo.setPosition(0);
@@ -69,129 +69,143 @@ public class AutoTest extends OpMode {
     }
 
 
+
+
+//#region paths
     public static class Paths {
-        public PathChain Path1;
-        public PathChain Path2;
-        public PathChain Path3;
-        public PathChain Path4;
-        public PathChain Path5;
-        public PathChain Path6;
+        public PathChain OuttakeStart;
+        public PathChain IntakeStart;
+        public PathChain IntakeEnd;
+        public PathChain OuttakeAfterIntake;
+        public PathChain OpenFromOuttake;
+        public PathChain OuttakeAfterOpen;
 
         public Paths(Follower follower) {
-            Path1 = follower.pathBuilder().addPath(
+            OuttakeStart = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(56.000, 136.000),
+                                    new Pose(20.000, 122.000),
 
-                                    new Pose(33.670, 109.757)
+                                    new Pose(48.000, 96.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(270), Math.toRadians(135))
+                    ).setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(135))
 
                     .build();
 
-            Path2 = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    new Pose(33.670, 109.757),
-
-                                    new Pose(34.174, 58.957)
+            IntakeStart = follower.pathBuilder().addPath(
+                            new BezierCurve(
+                                    new Pose(48.000, 96.000),
+                                    new Pose(52.796, 59.104),
+                                    new Pose(40.000, 60.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(180))
 
                     .build();
 
-            Path3 = follower.pathBuilder().addPath(
+            IntakeEnd = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(34.174, 58.957),
+                                    new Pose(40.000, 60.000),
 
-                                    new Pose(18.783, 59.687)
+                                    new Pose(20.000, 60.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
 
                     .build();
 
-            Path4 = follower.pathBuilder().addPath(
+            OuttakeAfterIntake = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(18.783, 59.687),
+                                    new Pose(20.000, 60.000),
 
-                                    new Pose(48.513, 97.757)
+                                    new Pose(48.000, 96.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(135))
 
                     .build();
 
-            Path5 = follower.pathBuilder().addPath(
-                            new BezierLine(
-                                    new Pose(48.513, 97.757),
-
-                                    new Pose(11.609, 60.739)
+            OpenFromOuttake = follower.pathBuilder().addPath(
+                            new BezierCurve(
+                                    new Pose(48.000, 96.000),
+                                    new Pose(34.587, 64.752),
+                                    new Pose(11.922, 60.548)
                             )
-                    ).setTangentHeadingInterpolation()
+                    ).setLinearHeadingInterpolation(Math.toRadians(135), Math.toRadians(150))
 
                     .build();
 
-            Path6 = follower.pathBuilder().addPath(
+            OuttakeAfterOpen = follower.pathBuilder().addPath(
                             new BezierLine(
-                                    new Pose(11.609, 60.739),
+                                    new Pose(11.922, 60.548),
 
-                                    new Pose(42.826, 100.174)
+                                    new Pose(48.000, 96.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(225), Math.toRadians(135))
+                    ).setLinearHeadingInterpolation(Math.toRadians(150), Math.toRadians(135))
 
                     .build();
-
         }
     }
-
+//#endregion paths
 
     public void autonomousPathUpdate() {
         switch (pathState){
             case 0:
-                followPath(paths.Path1,false);
-                setServoState(ServoState.OPEN);
+                followPath(paths.OuttakeStart,true);
                 setPathState(1);
                 break;
             case 1:
                 if(!follower.isBusy()) {
-                    followPath(paths.Path2,true);
-                    setServoState(ServoState.CLOSE);
+                    delay(1);
+                    followPath(paths.IntakeStart,true);
                     setPathState(2);
                 }
                 break;
             case 2:
                 if(!follower.isBusy()) {
-                    followPath(paths.Path3,true);
+                    followPath(paths.IntakeEnd,true);
                     setPathState(3);
                 }
                 break;
             case 3:
-                if(!follower.isBusy()) {
-                    followPath(paths.Path4,true);
+                if(!follower.isBusy()){
+                    delay(0.2);
+                    followPath(paths.OuttakeAfterIntake,true);
                     setPathState(4);
                 }
                 break;
             case 4:
-                if(!follower.isBusy()) {
-                    followPath(paths.Path5,true);
+                if(!follower.isBusy()){
+                    delay(1);
+                    followPath(paths.OpenFromOuttake,true);
                     setPathState(5);
                 }
                 break;
             case 5:
-                if(!follower.isBusy()) {
-                    followPath(paths.Path6,true);
+                if(!follower.isBusy()){
+                    delay(2);
+                    followPath(paths.OuttakeAfterOpen,true);
                     setPathState(6);
                 }
                 break;
             case 6:
-                if(waitTimer.getElapsedTime() > 1){
+                if(!follower.isBusy()){
+                    delay(1);
+                    followPath(paths.OpenFromOuttake,true);
                     setPathState(7);
                 }
                 break;
             case 7:
-                if(!follower.isBusy()) {
+                if(!follower.isBusy()){
+                    delay(2);
+                    followPath(paths.OuttakeAfterOpen,true);
+                    setPathState(8);
+                }
+                break;
+            case 8:
+                if(!follower.isBusy()){
                     setPathState(-1);
                 }
                 break;
             case -1:
                 //IDLE
+                panelsTelemetry.addData("status: ","complete");
                 break;
 
         }
@@ -210,7 +224,6 @@ public class AutoTest extends OpMode {
     }
     void setPathState(int state){
         pathState = state;
-        waitTimer.resetTimer();
     }
     void setServoState(ServoState state){
         servoState = state;
@@ -219,5 +232,13 @@ public class AutoTest extends OpMode {
         pathTimer.resetTimer();
         follower.followPath(path,holdEnd);
     }
+    void delay(double t){
+        Timer waitTimer = new Timer();
+        waitTimer.resetTimer();
+        while (waitTimer.getElapsedTimeSeconds() <= t){
+            panelsTelemetry.addData("status: ", "waiting");
+            panelsTelemetry.update();
+        }
+        return;
+    }
 }
-    
