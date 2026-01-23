@@ -9,9 +9,10 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Movement.ActionManaging;
-import org.firstinspires.ftc.teamcode.Movement.IMU_Driving;
+import org.firstinspires.ftc.teamcode.movement.ActionManaging;
 import org.firstinspires.ftc.teamcode.Vision.vision;
+import org.firstinspires.ftc.teamcode.movement.ActionManaging;
+import org.firstinspires.ftc.teamcode.movement.IMUDriving;
 
 import java.util.concurrent.TimeUnit;
 
@@ -23,7 +24,7 @@ public class TeleOpMain extends LinearOpMode {
     Limelight3A limelight;
 
     IMU imu;
-    IMU_Driving imu_driving;
+    IMUDriving imu_driving;
     ActionManaging action;
     vision visionModule = new vision();
 
@@ -52,7 +53,7 @@ public class TeleOpMain extends LinearOpMode {
         timer.reset();
 
         action = new ActionManaging(Turret_S, Turret_R, IntakeDc);
-        imu_driving = new IMU_Driving(fl,fr,rl, rr, imu, telemetry,gamepad1);
+        imu_driving = new IMUDriving(hardwareMap,telemetry,gamepad1);
         visionModule.VisionModule(hardwareMap, telemetry);
 
         imu_driving.init();
@@ -64,7 +65,7 @@ public class TeleOpMain extends LinearOpMode {
         if (opModeIsActive()) {
 
             while (opModeIsActive()) {
-                imu_driving.controlWithPad(IMU_Driving.GamepadPurpose.WHOLE);
+                imu_driving.controlWithPad(IMUDriving.GamepadPurpose.WHOLE);
                 action.preheat();
                 intakeR();
                 intake();
@@ -220,9 +221,9 @@ public class TeleOpMain extends LinearOpMode {
 
     void initialize() {
 
-        fl = hardwareMap.dcMotor.get("fl");
-        fr = hardwareMap.dcMotor.get("fr");
-        rl = hardwareMap.dcMotor.get("rl");
+        fl = hardwareMap.dcMotor.get("lf");
+        fr = hardwareMap.dcMotor.get("rf");
+        rl = hardwareMap.dcMotor.get("lr");
         rr = hardwareMap.dcMotor.get("rr");
         imu = hardwareMap.get(IMU.class,"imu");
 

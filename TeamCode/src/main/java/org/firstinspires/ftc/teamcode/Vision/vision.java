@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.Movement.IMU_Driving;
+import org.firstinspires.ftc.teamcode.movement.IMUDriving;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,12 +22,12 @@ public class vision {
     public List<Integer> colorArray = new ArrayList<>(Arrays.asList(0, 0, 0)); // 초록 1 보라 0
     public Telemetry telemetry;
 
-    public IMU_Driving drive;
+    public IMUDriving drive;
 
     public double tx ;
 
-    public double cam_height = 0; // 카메라 높이
-    public double target_height = 0; // 골대 태그 높이
+    public double cam_height = 0; // 카메라 높이 : MM
+    public double target_height = 754; // 골대 태그 높이 : MM
     public double cam_angle = 0; // 카메라 설치 각도
 
 
