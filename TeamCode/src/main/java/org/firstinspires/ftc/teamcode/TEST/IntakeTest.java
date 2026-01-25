@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.TEST;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-@TeleOp(name = "IntakeTest")
+@TeleOp
 public class IntakeTest extends LinearOpMode {
     DcMotor intake;
     boolean intakePressed = false;

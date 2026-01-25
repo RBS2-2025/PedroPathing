@@ -17,10 +17,10 @@ import java.util.concurrent.TimeUnit;
 @Configurable
 @TeleOp(name = "TurretTest",group = "test")
 public class TurretTest extends LinearOpMode {
-    public static double kP = 0;
+    public static double kP = 10;
     public static double kI = 0;
     public static double kD = 0;
-    public static double kF = 0;
+    public static double kF = 10;
     PIDFCoefficients coefficients;
     public static int PREHEAT_VELOCITY = 1000;
     public static int VELOCITY = 2000;
