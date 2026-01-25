@@ -18,9 +18,11 @@ public class IntakeTest extends LinearOpMode {
                 // OpMode loop
                 if(gamepad1.a && !intakePressed){
                     intake.setPower(0.7);
+                    intakePressed = true;
                 }
                 if(gamepad1.b && !intakePressed){
                     intake.setPower(1);
+                    intakePressed = true;
                 }
                 if (intakePressed && !gamepad1.a && !gamepad1.b){
                     intake.setPower(0);

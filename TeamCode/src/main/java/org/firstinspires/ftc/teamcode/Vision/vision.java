@@ -22,8 +22,6 @@ public class vision {
     public List<Integer> colorArray = new ArrayList<>(Arrays.asList(0, 0, 0)); // 초록 1 보라 0
     public Telemetry telemetry;
 
-    public IMUDriving drive;
-
     public double tx ;
 
     public double cam_height = 0; // 카메라 높이 : MM

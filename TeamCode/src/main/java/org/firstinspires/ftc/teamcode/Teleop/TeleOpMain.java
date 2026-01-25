@@ -9,10 +9,10 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.movement.ActionManaging;
 import org.firstinspires.ftc.teamcode.Vision.vision;
-import org.firstinspires.ftc.teamcode.movement.ActionManaging;
 import org.firstinspires.ftc.teamcode.movement.IMUDriving;
+import org.firstinspires.ftc.teamcode.movement.ActionManaging;
+
 
 import java.util.concurrent.TimeUnit;
 
@@ -56,7 +56,6 @@ public class TeleOpMain extends LinearOpMode {
         imu_driving = new IMUDriving(hardwareMap,telemetry,gamepad1);
         visionModule.VisionModule(hardwareMap, telemetry);
 
-        imu_driving.init();
         imu_driving.getYaw();
 
         waitForStart();

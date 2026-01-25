@@ -18,25 +18,23 @@ public class IMUDriving {
         this.fr = hMap.dcMotor.get("rf");
         this.rl = hMap.dcMotor.get("lr");
         this.rr = hMap.dcMotor.get("rr");
-        fl.setDirection(DcMotorSimple.Direction.REVERSE);
-        rl.setDirection(DcMotorSimple.Direction.REVERSE);
+        fr.setDirection(DcMotorSimple.Direction.REVERSE);
+        rr.setDirection(DcMotorSimple.Direction.REVERSE);
         this.imu = hMap.get(IMU.class, "imu");
         this.telemetry = telemetry;
         this.gamepad = gamepad1;
+        imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.LEFT, RevHubOrientationOnRobot.UsbFacingDirection.UP)));
+        imu.resetYaw();
+        telemetry.addData("IMU: ", "INITIALIZED");
     }
     public DcMotor fl,fr,rl,rr;
     public IMU imu;
     public Telemetry telemetry;
     public Gamepad gamepad;
 
-    public double speed = 0.7;
+    public double speed = 1;
     double yaw;
 
-    public void init(){
-        imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, RevHubOrientationOnRobot.UsbFacingDirection.UP)));
-        imu.resetYaw();
-        telemetry.addData("IMU: ", "INITIALIZED");
-    }
 
 
     public double getYaw(){
@@ -60,7 +58,7 @@ public class IMUDriving {
         imu.resetYaw();
     }
 
-    public double rotateSlowThreshold = 50;
+    public double rotateSlowThreshold = 15;
 
     /**
      * GET YAW!!
