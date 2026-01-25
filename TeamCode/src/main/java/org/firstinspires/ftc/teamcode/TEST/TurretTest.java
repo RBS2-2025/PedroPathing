@@ -2,11 +2,9 @@ package org.firstinspires.ftc.teamcode.TEST;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.pedropathing.util.Timer;
-import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -14,13 +12,14 @@ import org.firstinspires.ftc.teamcode.movement.IMUDriving;
 import org.firstinspires.ftc.teamcode.utils.PanelsHelper;
 
 import java.util.concurrent.TimeUnit;
+
 @Configurable
 @TeleOp(name = "TurretTest",group = "test")
 public class TurretTest extends LinearOpMode {
     public static double kP = 10;
     public static double kI = 0;
     public static double kD = 0;
-    public static double kF = 10;
+    public static double kF = 24;
     PIDFCoefficients coefficients;
     public static int PREHEAT_VELOCITY = 1000;
     public static int VELOCITY = 2000;
@@ -30,10 +29,10 @@ public class TurretTest extends LinearOpMode {
     DcMotorEx outtakeMotor;
     DcMotor intake;
     PanelsHelper panels;
-    boolean aPressed = false;
+    boolean bPressed = false;
     boolean outtakeResting = false;
     boolean intakePressed;
-    Timer outtakeTimer;
+    ElapsedTime outtakeTimer;
 
 
     @Override
@@ -47,8 +46,8 @@ public class TurretTest extends LinearOpMode {
             outtakeMotor = hardwareMap.get(DcMotorEx.class,"Turret_S");
             panels = new PanelsHelper(this);
             targetVeocity = PREHEAT_VELOCITY;
-            outtakeTimer = new Timer();
-            outtakeTimer.resetTimer();
+            outtakeTimer = new ElapsedTime();
+            outtakeTimer.reset();
 
             intake = hardwareMap.dcMotor.get("IntakeDc");
 
@@ -76,22 +75,20 @@ public class TurretTest extends LinearOpMode {
                 if(gamepad2.dpad_right){
                     unit *= 10;
                 }
-                if(gamepad2.b && !aPressed){
-                    aPressed = true;
+                if(gamepad2.b && !bPressed){
+                    bPressed = true;
                     targetVeocity = VELOCITY;
-                    outtakeMotor.setVelocity(targetVeocity);
                 }
-                if(!gamepad2.b && aPressed){
-                    aPressed = false;
+                if(!gamepad2.b && bPressed && !outtakeResting){
+                    bPressed = false;
                     outtakeResting = true;
                     outtakeMotor.setPower(0);
-                    outtakeTimer.resetTimer();
+                    outtakeTimer.reset();
                 }
-                if(!gamepad2.b && outtakeResting){
-                    if(outtakeTimer.getElapsedTimeSeconds() > 1){
+                if(outtakeResting){
+                    if(outtakeTimer.time(TimeUnit.SECONDS) > 2){
                         outtakeResting = false;
                         targetVeocity = PREHEAT_VELOCITY;
-                        outtakeMotor.setVelocity(targetVeocity);
                     }
                 }
                 if(gamepad2.a && !intakePressed){
@@ -102,9 +99,13 @@ public class TurretTest extends LinearOpMode {
                     intake.setPower(0);
                     intakePressed = false;
                 }
+                if(!outtakeResting){
+                    outtakeMotor.setVelocity(targetVeocity);
+                }
 
 //                panels.addData("distance: ",distance==-1?"error":distance);
                 panels.addData("target velocity: ",targetVeocity);
+                panels.addData("current velocity:", outtakeMotor.getVelocity());
                 panels.update();
             }
         }
