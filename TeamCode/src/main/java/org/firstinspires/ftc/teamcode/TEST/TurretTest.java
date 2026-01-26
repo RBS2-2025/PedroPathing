@@ -16,13 +16,13 @@ import java.util.concurrent.TimeUnit;
 @Configurable
 @TeleOp(name = "TurretTest",group = "test")
 public class TurretTest extends LinearOpMode {
-    public static double kP = 10;
+    public static double kP = 450;
     public static double kI = 0;
     public static double kD = 0;
-    public static double kF = 24;
+    public static double kF = 15;
     PIDFCoefficients coefficients;
     public static int PREHEAT_VELOCITY = 1000;
-    public static int VELOCITY = 2000;
+    public static int VELOCITY = 1500;
     public static boolean USE_PIXEL = false;
     int targetVeocity;
     int unit = 100;
@@ -86,7 +86,7 @@ public class TurretTest extends LinearOpMode {
                     outtakeTimer.reset();
                 }
                 if(outtakeResting){
-                    if(outtakeTimer.time(TimeUnit.SECONDS) > 2){
+                    if(outtakeTimer.time(TimeUnit.SECONDS) > 2 + kP/100){
                         outtakeResting = false;
                         targetVeocity = PREHEAT_VELOCITY;
                     }
@@ -100,11 +100,14 @@ public class TurretTest extends LinearOpMode {
                     intakePressed = false;
                 }
                 if(!outtakeResting){
+                    panels.addData("target velocity: ",targetVeocity);
                     outtakeMotor.setVelocity(targetVeocity);
+                }
+                else{
+                    panels.addData("target velocity: ", "RESTING...");
                 }
 
 //                panels.addData("distance: ",distance==-1?"error":distance);
-                panels.addData("target velocity: ",targetVeocity);
                 panels.addData("current velocity:", outtakeMotor.getVelocity());
                 panels.update();
             }
