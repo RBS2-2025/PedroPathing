@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.hardware.Robot;
 
 import java.util.List;
 
@@ -26,11 +27,12 @@ public class TurretControl {
     double deadZone = 0.1;
     IMU imu;
 
-    public TurretControl(HardwareMap hardwareMap, Telemetry telemetry, boolean blue, IMU imu){
-        this.limelight = hardwareMap.get(Limelight3A.class,"limelight");
+    public TurretControl(Robot robot, Telemetry telemetry, boolean blue, IMU imu){
+//        this.limelight = hardwareMap.get(Limelight3A.class,"limelight");
+        this.limelight = robot.limelight;
+        this.turretMotor = robot.tracker;
         this.telemetry = telemetry;
         this.isBlue = blue;
-        this.turretMotor = hardwareMap.dcMotor.get("");//TODO 모터 configuration
         this.targetID = this.isBlue? 20 : 24;
         this.imu = imu;
 

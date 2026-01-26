@@ -1,13 +1,15 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.hardware.TaskLogics;
 import org.firstinspires.ftc.teamcode.movement.IMUDriving;
 import org.firstinspires.ftc.teamcode.utils.PanelsHelper;
 
-public class TeleOpMain extends OpMode {
+@TeleOp(name = "TeleOp Blue",group = "TeleOp")
+public class TeleOpMainBlue extends OpMode {
     Robot robot;
     IMUDriving imuDriving;
     PanelsHelper panel;
@@ -18,7 +20,7 @@ public class TeleOpMain extends OpMode {
         this.robot = new Robot(hardwareMap,true);
         this.panel = new PanelsHelper(this);
         this.imuDriving = new IMUDriving(hardwareMap,panel,gamepad1);
-        this.task = new TaskLogics(this.robot);
+        this.task = new TaskLogics(this.robot,true);
     }
 
     @Override

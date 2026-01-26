@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.movement.IMUDriving;
 
 import java.util.ArrayList;
@@ -29,8 +30,9 @@ public class vision {
     public double cam_angle = 0; // 카메라 설치 각도
 
 
-    public void VisionModule(HardwareMap hardwareMap, Telemetry telemetry) {
-        this.limelight = hardwareMap.get(Limelight3A.class, "limelight");
+    public void VisionModule(Robot robot, Telemetry telemetry) {
+//        this.limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        this.limelight = robot.limelight;
         this.telemetry = telemetry;
 
         telemetry.setMsTransmissionInterval(11);
