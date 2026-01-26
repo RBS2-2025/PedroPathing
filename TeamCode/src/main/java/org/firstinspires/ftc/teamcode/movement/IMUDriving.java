@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.movement;
 
+import com.bylazar.panels.Panels;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -9,11 +10,12 @@ import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.utils.PanelsHelper;
 import org.firstinspires.ftc.teamcode.utils.Vector2d;
 
 public class IMUDriving {
 
-    public IMUDriving(HardwareMap hMap, Telemetry telemetry, Gamepad gamepad1){
+    public IMUDriving(HardwareMap hMap, PanelsHelper telemetry, Gamepad gamepad1){
         this.fl = hMap.dcMotor.get("lf");
         this.fr = hMap.dcMotor.get("rf");
         this.rl = hMap.dcMotor.get("lr");
@@ -29,7 +31,7 @@ public class IMUDriving {
     }
     public DcMotor fl,fr,rl,rr;
     public IMU imu;
-    public Telemetry telemetry;
+    public PanelsHelper telemetry;
     public Gamepad gamepad;
 
     public double speed = 1;

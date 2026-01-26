@@ -40,6 +40,8 @@ public class Robot {
         this.shooter = hardwareMap.get(DcMotorEx.class, "Turret_S");
         this.tracker = hardwareMap.get(DcMotorEx.class, "Turret_R");
 
+        this.intaker.setDirection(DcMotorSimple.Direction.REVERSE);
+
         this.blocker = hardwareMap.get(Servo.class, "blocker");
 
         this.limelight = hardwareMap.get(Limelight3A.class,"limelight");
