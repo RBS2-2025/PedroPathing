@@ -45,7 +45,7 @@ public class TurretControl {
         limelight.stop();
     }
 
-    public void align(double maxPower, boolean byPixel){
+    public void align(double maxPower, boolean byPixel, double speed){
         limelight.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw());
         LLResult result = limelight.getLatestResult();
         if(!result.isValid()) return;
@@ -57,16 +57,16 @@ public class TurretControl {
         for(LLResultTypes.FiducialResult fr : fiducialResults){
             if (fr.getFiducialId() != targetID) continue;
             if(byPixel){
-                tx = fr.getTargetXPixels();
+                tx = fr.getTargetXPixels() * speed;
             }
             else{
-                tx = fr.getTargetXDegrees(); // 1
+                tx = fr.getTargetXDegrees() * speed; // 1
             }
             if(Math.abs(tx) < deadZone) {
                 turretMotor.setPower(0);
                 return;
             }
-            double power = tx * 0.03;
+            double power = tx;
             if(Math.abs(power) > maxPower) {
                 power = Math.signum(power) * maxPower;
             }

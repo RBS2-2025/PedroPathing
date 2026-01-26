@@ -51,10 +51,10 @@ public class TurretTest extends LinearOpMode {
 
             intake = hardwareMap.dcMotor.get("IntakeDc");
 
-            IMUDriving imuDriving = new IMUDriving(hardwareMap,telemetry,gamepad1);
+//            IMUDriving imuDriving = new IMUDriving(hardwareMap,telemetry,gamepad1);
             while (opModeIsActive()) {
                 // OpMode loop
-                imuDriving.controlWithPad(IMUDriving.GamepadPurpose.WHOLE);
+//                imuDriving.controlWithPad(IMUDriving.GamepadPurpose.WHOLE);
                 //
                 coefficients = new PIDFCoefficients(kP,kI,kD,kF*(12/hardwareMap.voltageSensor.iterator().next().getVoltage()));
                 outtakeMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,coefficients);

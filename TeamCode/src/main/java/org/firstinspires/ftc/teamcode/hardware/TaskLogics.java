@@ -199,7 +199,7 @@ public class TaskLogics {
 
 //region track
     void track(){
-        turretControl.align(0.05,false);
+        turretControl.align(0.05,false,0.05);
     }
     void track_reset(){
         tracker.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
