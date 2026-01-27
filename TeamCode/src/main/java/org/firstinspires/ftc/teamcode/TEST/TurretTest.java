@@ -31,8 +31,9 @@ public class TurretTest extends LinearOpMode {
     PanelsHelper panels;
     boolean bPressed = false;
     boolean outtakeResting = false;
-    boolean intakePressed;
+    boolean intakePressed = false;
     ElapsedTime outtakeTimer;
+    ElapsedTime feedTimer;
 
 
     @Override
@@ -41,25 +42,20 @@ public class TurretTest extends LinearOpMode {
         if (opModeIsActive()) {
             // Pre-run
 
-//            TurretControl turret = new TurretControl(hardwareMap,telemetry,true,imu);
 
             outtakeMotor = hardwareMap.get(DcMotorEx.class,"Turret_S");
             panels = new PanelsHelper(this);
             targetVeocity = PREHEAT_VELOCITY;
             outtakeTimer = new ElapsedTime();
             outtakeTimer.reset();
-
+            feedTimer = new ElapsedTime();
+            feedTimer.reset();
             intake = hardwareMap.dcMotor.get("IntakeDc");
 
-//            IMUDriving imuDriving = new IMUDriving(hardwareMap,telemetry,gamepad1);
             while (opModeIsActive()) {
                 // OpMode loop
-//                imuDriving.controlWithPad(IMUDriving.GamepadPurpose.WHOLE);
-                //
                 coefficients = new PIDFCoefficients(kP,kI,kD,kF*(12/hardwareMap.voltageSensor.iterator().next().getVoltage()));
                 outtakeMotor.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,coefficients);
-//                turret.align(0.1,USE_PIXEL);
-//                double distance = turret.getDistance();
 
                 if(gamepad2.dpad_up){
                     VELOCITY += unit;
@@ -78,11 +74,18 @@ public class TurretTest extends LinearOpMode {
                 if(gamepad2.b && !bPressed){
                     bPressed = true;
                     targetVeocity = VELOCITY;
+                    feedTimer.reset();
+                }
+                if(bPressed){
+                    if(feedTimer.time(TimeUnit.SECONDS) > 1.5){
+                        intake.setPower(-1);
+                    }
                 }
                 if(!gamepad2.b && bPressed && !outtakeResting){
                     bPressed = false;
                     outtakeResting = true;
                     outtakeMotor.setPower(0);
+                    intake.setPower(0);
                     outtakeTimer.reset();
                 }
                 if(outtakeResting){
@@ -107,7 +110,6 @@ public class TurretTest extends LinearOpMode {
                     panels.addData("target velocity: ", "RESTING...");
                 }
 
-//                panels.addData("distance: ",distance==-1?"error":distance);
                 panels.addData("current velocity:", outtakeMotor.getVelocity());
                 panels.update();
             }

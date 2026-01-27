@@ -15,7 +15,6 @@ import java.util.List;
 public class TurretControl {
     public Limelight3A limelight;
     public DcMotor turretMotor;
-    public Telemetry telemetry;
 
     public double tx; //x 차이
 
@@ -27,16 +26,16 @@ public class TurretControl {
     double deadZone = 0.1;
     IMU imu;
 
-    public TurretControl(Robot robot, Telemetry telemetry, boolean blue, IMU imu){
+    public TurretControl(Robot robot, boolean blue, IMU imu){
 //        this.limelight = hardwareMap.get(Limelight3A.class,"limelight");
         this.limelight = robot.limelight;
         this.turretMotor = robot.tracker;
-        this.telemetry = telemetry;
+
         this.isBlue = blue;
         this.targetID = this.isBlue? 20 : 24;
         this.imu = imu;
 
-        telemetry.setMsTransmissionInterval(11);
+
         limelight.pipelineSwitch(0); // 0번 파이프라인 (예: AprilTag)
         limelight.start();
     }

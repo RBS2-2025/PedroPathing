@@ -62,7 +62,7 @@ public class TaskLogics {
         this.shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,this.outtakePIDF_near);
         this.blocker = robot.blocker;
         this.tracker = robot.tracker;
-        this.turretControl = new TurretControl(robot, turretControl.telemetry,isBlue,robot.imu);
+        this.turretControl = new TurretControl(robot, isBlue,robot.imu);
         for (STATES state : STATES.values()) {
             timers.put(state, new ElapsedTime());
         }
@@ -199,13 +199,13 @@ public class TaskLogics {
 
 //region track
     void track(){
-        turretControl.align(0.05,false,0.05);
+        turretControl.align(0.4,false,0.1);
     }
     void track_reset(){
         tracker.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         tracker.setTargetPosition(0);
         tracker.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        tracker.setPower(0.1);
+        tracker.setPower(0.4);//max_power
         this.setTrackingState(TRACKINGSTATE.IDLE);
     }
     void track_stop(){
