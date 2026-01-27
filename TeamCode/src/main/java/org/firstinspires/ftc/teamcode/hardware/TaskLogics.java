@@ -101,12 +101,32 @@ public class TaskLogics {
             case REST:
                 outtake_rest();
                 break;
+            case TOFAR:
+                if(this.shooting_target_velocity != this.SHOOTING_VELOCITY_FAR){
+                    changeOuttakePosition(OUTTAKEPOSITION.FAR);
+                }
+                break;
+            case TONEAR:
+                if(this.shooting_target_velocity != this.SHOOTING_VELOCITY_NEAR){
+                    changeOuttakePosition(OUTTAKEPOSITION.NEAR);
+                }
+                break;
+            case TOGGLE_POSITION:
+                if(this.shooting_target_velocity != this.SHOOTING_VELOCITY_NEAR){
+                    changeOuttakePosition(OUTTAKEPOSITION.NEAR);
+                    break;
+                }
+                if(this.shooting_target_velocity != this.SHOOTING_VELOCITY_FAR){
+                    changeOuttakePosition(OUTTAKEPOSITION.FAR);
+                    break;
+                }
+                break;
         }
         switch (trackingState){
             case IDLE:
                 //IDLE
                 break;
-            case TRACE:
+            case TRACK:
                 track();
                 break;
             case RESET:
@@ -114,6 +134,12 @@ public class TaskLogics {
                 break;
             case STOP:
                 track_stop();
+                break;
+            case MANUAL_L:
+                track_manual(false);
+                break;
+            case MANUAL_R:
+                track_manual(true);
                 break;
         }
         switch (blockState){
@@ -189,11 +215,14 @@ public class TaskLogics {
         switch (targetPosition){
             case NEAR:
                 this.shooting_target_velocity = this.SHOOTING_VELOCITY_NEAR;
+                this.shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,this.outtakePIDF_near);
                 break;
             case FAR:
                 this.shooting_target_velocity = this.SHOOTING_VELOCITY_FAR;
+                this.shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,this.outakePIDF_far);
                 break;
         }
+        this.setOuttakeState(OUTTAKESTATE.PREHEAT);
     }
 //endregion outtake
 
@@ -206,10 +235,17 @@ public class TaskLogics {
         tracker.setTargetPosition(0);
         tracker.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         tracker.setPower(0.4);//max_power
-        this.setTrackingState(TRACKINGSTATE.IDLE);
+        if(Math.abs(tracker.getCurrentPosition()) < 10){
+            setTrackingState(TRACKINGSTATE.IDLE);
+        }
     }
     void track_stop(){
+        tracker.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        tracker.setPower(0);
         this.setTrackingState(TRACKINGSTATE.IDLE);
+    }
+    void track_manual(boolean toRight){
+        tracker.setPower((toRight? 0.4: -0.4));
     }
 //endregion track
 

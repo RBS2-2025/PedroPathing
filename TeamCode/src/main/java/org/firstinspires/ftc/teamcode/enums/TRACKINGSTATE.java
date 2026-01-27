@@ -2,7 +2,9 @@ package org.firstinspires.ftc.teamcode.enums;
 
 public enum TRACKINGSTATE{
     IDLE,
-    TRACE,
+    TRACK,
     RESET,
-    STOP
+    STOP,
+    MANUAL_L,
+    MANUAL_R
 }
