@@ -2,13 +2,15 @@ package org.firstinspires.ftc.teamcode.Movement;
 
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 
 import org.firstinspires.ftc.robotcore.external.JavaUtil;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 
-public class IMU_Driving {
+public class IMUDriving {
     public static class Vector2d {
         public double x;
         public double y;
@@ -17,28 +19,28 @@ public class IMU_Driving {
             this.y = y;
         }
     }
-    public IMU_Driving(DcMotor fl, DcMotor fr, DcMotor rl, DcMotor rr, IMU imu, Telemetry telemetry, Gamepad gamepad1){
-        this.fl = fl;
-        this.fr = fr;
-        this.rl = rl;
-        this.rr = rr;
-        this.imu = imu;
+    public IMUDriving(HardwareMap hMap, Telemetry telemetry, Gamepad gamepad1){
+        this.fl = hMap.dcMotor.get("lf");
+        this.fr = hMap.dcMotor.get("rf");
+        this.rl = hMap.dcMotor.get("lr");
+        this.rr = hMap.dcMotor.get("rr");
+        fr.setDirection(DcMotorSimple.Direction.REVERSE);
+        rr.setDirection(DcMotorSimple.Direction.REVERSE);
+        this.imu = hMap.get(IMU.class, "imu");
         this.telemetry = telemetry;
-        this.gamepad1 = gamepad1;
+        this.gamepad = gamepad1;
+        imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.LEFT, RevHubOrientationOnRobot.UsbFacingDirection.UP)));
+        imu.resetYaw();
+        telemetry.addData("IMU: ", "INITIALIZED");
     }
     public DcMotor fl,fr,rl,rr;
     public IMU imu;
     public Telemetry telemetry;
-    public Gamepad gamepad1;
+    public Gamepad gamepad;
 
-    public double speed = 0.7;
+    public double speed = 1;
     double yaw;
 
-    public void init(){
-        imu.initialize(new IMU.Parameters(new RevHubOrientationOnRobot(RevHubOrientationOnRobot.LogoFacingDirection.RIGHT, RevHubOrientationOnRobot.UsbFacingDirection.UP)));
-        imu.resetYaw();
-        telemetry.addData("IMU: ", "INITIALIZED");
-    }
 
 
     public double getYaw(){
@@ -62,7 +64,7 @@ public class IMU_Driving {
         imu.resetYaw();
     }
 
-    public double rotateSlowThreshold = 50;
+    public double rotateSlowThreshold = 15;
 
     /**
      * GET YAW!!
@@ -90,7 +92,7 @@ public class IMU_Driving {
     /**
      *
      * @param targetYaw 타겟 각도
-     * @see IMU_Driving#getRotatePower(double) 
+     * @see IMUDriving#getRotatePower(double)
      */
     public boolean rotate2Deg(double targetYaw){
         double rx;
@@ -110,9 +112,9 @@ public class IMU_Driving {
         double mY = 0;
 
         //rotate: right stick
-        if(p == GamepadPurpose.ROTATE || p == GamepadPurpose.WHOLE && !(Math.abs(gamepad1.right_stick_x) < 0.1 && Math.abs(gamepad1.right_stick_y) < 0.1)){
-            double x = gamepad1.right_stick_x;
-            double y = -gamepad1.right_stick_y;
+        if(p == GamepadPurpose.ROTATE || p == GamepadPurpose.WHOLE && !(Math.abs(gamepad.right_stick_x) < 0.1 && Math.abs(gamepad.right_stick_y) < 0.1)){
+            double x = gamepad.right_stick_x;
+            double y = -gamepad.right_stick_y;
             telemetry.addData("move: ", x + "/" + y );
             double targetYaw = -Math.toDegrees(Math.atan2(x,y)); // 90도 회전 (위 -> 0)
             if(Math.abs(targetYaw - yaw) > 1.5){
@@ -128,19 +130,19 @@ public class IMU_Driving {
         }
 
         //dpad
-        if(gamepad1.dpad_left || gamepad1.dpad_right){
-            rx = (gamepad1.dpad_right? 1:0) - (gamepad1.dpad_left? 1:0);
+        if(gamepad.dpad_left || gamepad.dpad_right){
+            rx = (gamepad.dpad_right? 1:0) - (gamepad.dpad_left? 1:0);
         }
         //init
-        if((p == GamepadPurpose.MOVE || p == GamepadPurpose.WHOLE) && gamepad1.leftStickButtonWasPressed()){
+        if((p == GamepadPurpose.MOVE || p == GamepadPurpose.WHOLE) && gamepad.leftStickButtonWasPressed()){
             imu.resetYaw();
         }
 
         // 속도 조절 g1.rb -- / lb -
         speed = 0.7;
-        if(gamepad1.right_bumper){
+        if(gamepad.right_bumper){
             speed = 0.3;
-        }else if (gamepad1.left_bumper ){
+        }else if (gamepad.left_bumper ){
             speed = 0.5;
         }
 
@@ -160,13 +162,12 @@ public class IMU_Driving {
 
     /**
      * GetYaw!!
-     *
-     * @return (dx, dy) - 이동 방향
+     * @return (dx,dy) - 이동 방향
      */
     Vector2d getMovePower(){
-        double x = gamepad1.left_stick_x;
-        double y = -gamepad1.left_stick_y;
-        if(Math.abs(x) < 0.1 && Math.abs(y) < 0.1) return new Vector2d(0, 0);
+        double x = gamepad.left_stick_x;
+        double y = -gamepad.left_stick_y;
+        if(Math.abs(x) < 0.1 && Math.abs(y) < 0.1) return new Vector2d(0,0);
         double radian = Math.toRadians(getYaw()); // 라디안 계산 때는 정방향 필요
 
         double a = x * Math.cos(radian) + y * Math.sin(radian);
@@ -175,7 +176,7 @@ public class IMU_Driving {
         if(Math.abs(a) < 0.00000025) a = 0;
         if(Math.abs(b) < 0.00000025) b = 0;
         telemetry.addData("move: ", a + "/" + b );
-        return new Vector2d(a, b);
+        return new Vector2d(a,b);
     }
 
 
@@ -195,4 +196,3 @@ public class IMU_Driving {
     }
 
 }
-

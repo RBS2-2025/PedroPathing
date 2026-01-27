@@ -9,17 +9,12 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 
 // panel 대시보드 사용 도구
 public class PanelHelper {
-
     public final GamepadManager g1Manager;
     public final GamepadManager g2Manager;
-
     public final TelemetryManager telemetryManager;
-
     public Gamepad gamepad1;
     public Gamepad gamepad2;
-
     private final OpMode op;
-
     /**
      * Panel 텔레메트리 , 게임패드 init
      * @param opMode
