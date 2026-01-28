@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Teleop;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.teamcode.enums.BLOCKSTATE;
 import org.firstinspires.ftc.teamcode.enums.INTAKESTATE;
 import org.firstinspires.ftc.teamcode.enums.OUTTAKESTATE;
 import org.firstinspires.ftc.teamcode.enums.TRACKINGSTATE;
@@ -31,6 +32,7 @@ public class TeleOpMainBlue extends OpMode {
         this.panel = new PanelsHelper(this);
         this.imuDriving = new IMUDriving(hardwareMap,panel,gamepad1);
         this.task = new TaskLogics(this.robot,true);
+        this.task.panel = this.panel;
     }
 
     @Override
@@ -97,6 +99,9 @@ public class TeleOpMainBlue extends OpMode {
             task.setTrackingState(TRACKINGSTATE.STOP);
         }
         //endregion dpad_r - rotate turret R
+        if(gamepad2.right_trigger > 0.5){
+            task.setBlockState(BLOCKSTATE.OPEN);
+        }
     }
 
 

@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.enums.OUTTAKEPOSITION;
 import org.firstinspires.ftc.teamcode.enums.OUTTAKESTATE;
 import org.firstinspires.ftc.teamcode.enums.STATES;
 import org.firstinspires.ftc.teamcode.enums.TRACKINGSTATE;
+import org.firstinspires.ftc.teamcode.utils.PanelsHelper;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -36,12 +37,12 @@ public class TaskLogics {
 //endregion state
 
 //region outtake
-    double SHOOTING_VELOCITY_NEAR = 0;
-    double SHOOTING_VELOCITY_FAR = 0;
+    double SHOOTING_VELOCITY_NEAR = 1500;
+    double SHOOTING_VELOCITY_FAR = 2000;
     double shooting_target_velocity;
-    double PREHEAT_VELOCITY = 0;
-    PIDFCoefficients outtakePIDF_near = new PIDFCoefficients(0,0,0,0);
-    PIDFCoefficients outakePIDF_far = new PIDFCoefficients(0,0,0,0);
+    double PREHEAT_VELOCITY = 500;
+    PIDFCoefficients outtakePIDF_near = new PIDFCoefficients(450,0,0,15);
+    PIDFCoefficients outakePIDF_far = new PIDFCoefficients(450,0,0,15);
 //endregion outtake
 
 //region tracker
@@ -49,9 +50,13 @@ public class TaskLogics {
 //endregion tracker
 
 //region block
-    double OPEN_POSITION = 0;
-    double BLOCK_POSITION = 1;
+    double OPEN_POSITION = 0.56;
+    double BLOCK_POSITION = 0.44;
 //endregion block
+
+//region panels
+    public PanelsHelper panel;
+//endregion panels
 
     Map<STATES,ElapsedTime> timers = new EnumMap<>(STATES.class);
 
@@ -72,7 +77,7 @@ public class TaskLogics {
         this.setOuttakeState(OUTTAKESTATE.PREHEAT);
         this.setTrackingState(TRACKINGSTATE.RESET);
         this.setBlockState(BLOCKSTATE.BLOCK);
-
+        changeOuttakePosition(OUTTAKEPOSITION.NEAR);
 
     } // 기본 상태 (시작 시)
 
@@ -153,6 +158,14 @@ public class TaskLogics {
                 open_block();
                 break;
         }
+        if(panel != null){
+            panel.addData("intake: ", intakeState);
+            panel.addData("outtake: ", outtakeState);
+            panel.addData("tracking: ",trackingState);
+            panel.addData("block: ",blockState);
+            panel.addData("shoot velocity: ",shooting_target_velocity);
+            panel.update();
+        }
     }
 
 //methods
@@ -204,9 +217,13 @@ public class TaskLogics {
     }
     void shoot(){
         this.shooter.setVelocity(this.shooting_target_velocity);
+        if(this.timers.get(STATES.OUTTAKE).time(TimeUnit.SECONDS) > 0.5){
+            this.setIntakeState(INTAKESTATE.INTAKE);
+        }
     }
     void outtake_rest(){
         this.shooter.setPower(0);
+        this.setIntakeState(INTAKESTATE.STOP);
         if(this.timers.get(STATES.OUTTAKE).time(TimeUnit.SECONDS) > 2){
             this.setOuttakeState(OUTTAKESTATE.PREHEAT);
         }

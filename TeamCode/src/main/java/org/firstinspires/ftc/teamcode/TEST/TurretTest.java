@@ -24,6 +24,7 @@ public class TurretTest extends LinearOpMode {
     public static int PREHEAT_VELOCITY = 1000;
     public static int VELOCITY = 2100;
     public static boolean USE_PIXEL = false;
+    public static double delay = 1.5;
     int targetVeocity;
     int unit = 100;
     DcMotorEx outtakeMotor;
@@ -77,7 +78,7 @@ public class TurretTest extends LinearOpMode {
                     feedTimer.reset();
                 }
                 if(bPressed){
-                    if(feedTimer.time(TimeUnit.SECONDS) > 1.5){
+                    if(feedTimer.time(TimeUnit.SECONDS) > delay){
                         intake.setPower(-1);
                     }
                 }

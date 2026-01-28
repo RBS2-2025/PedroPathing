@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
+import android.graphics.RectF;
+
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -41,6 +43,7 @@ public class Robot {
         this.tracker = hardwareMap.get(DcMotorEx.class, "Turret_R");
 
         this.intaker.setDirection(DcMotorSimple.Direction.REVERSE);
+        this.tracker.setDirection(DcMotorSimple.Direction.REVERSE);
 
         this.blocker = hardwareMap.get(Servo.class, "blocker");
 
