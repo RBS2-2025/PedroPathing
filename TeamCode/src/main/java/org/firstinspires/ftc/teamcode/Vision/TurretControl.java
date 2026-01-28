@@ -35,8 +35,8 @@ public class TurretControl {
         this.turretMotor = robot.tracker;
 
         this.isBlue = blue;
-//        this.targetID = this.isBlue? 20 : 24;
-        this.targetID = 21;
+        this.targetID = this.isBlue? 20 : 24;
+//        this.targetID = 21;
         this.imu = imu;
 
 

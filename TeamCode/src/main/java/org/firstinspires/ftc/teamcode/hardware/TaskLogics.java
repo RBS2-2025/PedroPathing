@@ -193,6 +193,13 @@ public class TaskLogics {
     public double getTime(STATES state,TimeUnit unit){
         return this.timers.get(state).time(unit);
     }
+    public boolean isBusy(){
+        return
+                !(this.intakeState == INTAKESTATE.IDLE
+                && this.outtakeState == OUTTAKESTATE.PREHEAT
+                && this.trackingState == TRACKINGSTATE.IDLE
+                && this.blockState == BLOCKSTATE.IDLE);
+    }
 
 //endregion manager
 

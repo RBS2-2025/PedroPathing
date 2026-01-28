@@ -58,12 +58,14 @@ public class TeleOpMainBlue extends OpMode {
         //endregion a - intake
         //region b - shoot
         if(gamepad2.bWasPressed()){
+            task.setBlockState(BLOCKSTATE.OPEN);
             task.setOuttakeState(OUTTAKESTATE.SHOOT);
             task.setTrackingState(TRACKINGSTATE.TRACK);
         }
         if(gamepad2.bWasReleased()){
             task.setOuttakeState(OUTTAKESTATE.REST);
             task.setTrackingState(TRACKINGSTATE.RESET);
+            task.setBlockState(BLOCKSTATE.BLOCK);
         }
         //endregion b - shoot
         //region x - discharge
@@ -99,9 +101,7 @@ public class TeleOpMainBlue extends OpMode {
             task.setTrackingState(TRACKINGSTATE.STOP);
         }
         //endregion dpad_r - rotate turret R
-        if(gamepad2.right_trigger > 0.5){
-            task.setBlockState(BLOCKSTATE.OPEN);
-        }
+
     }
 
 
