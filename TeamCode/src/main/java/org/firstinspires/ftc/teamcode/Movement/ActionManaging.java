@@ -3,21 +3,24 @@ package org.firstinspires.ftc.teamcode.movement;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 
 public class ActionManaging {
+
+
     //    Servo lifting;
     public DcMotor Turret_R , IntakeDc;
     public DcMotorEx Turret_S;
     private static final double PREHEAT_VELOCITY = 1000;
-    private static final double SHOOT_VELOCITY   = 2000;
+    private static final double SHOOT_VELOCITY   = 1500;
     private double currentTargetVelocity = 0;
 
-    private static final double P = 270;
+    private static final double P = 450;
     private static final double I = 0.0;
     private static final double D = 0.0;
-    private static final double BASE_F = 17.6;
+    private static final double BASE_F = 15;
 
     private static final double NOMINAL_VOLTAGE = 12.0;
 
@@ -28,6 +31,7 @@ public class ActionManaging {
     }
 
     public void intake(double power_in) {
+        IntakeDc.setDirection(DcMotorSimple.Direction.REVERSE);
         IntakeDc.setPower(power_in);
     }
 

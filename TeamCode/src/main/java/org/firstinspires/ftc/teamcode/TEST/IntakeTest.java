@@ -2,7 +2,6 @@ package org.firstinspires.ftc.teamcode.TEST;
 
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 @TeleOp
 public class IntakeTest extends LinearOpMode {
@@ -13,13 +12,12 @@ public class IntakeTest extends LinearOpMode {
         waitForStart();
         if (opModeIsActive()) {
             intake = hardwareMap.dcMotor.get("IntakeDc");
-            intake.setDirection(DcMotorSimple.Direction.REVERSE);
 
             // Pre-run
             while (opModeIsActive()) {
                 // OpMode loop
                 if(gamepad1.a && !intakePressed){
-                    intake.setPower(0.6);
+                    intake.setPower(0.7);
                     intakePressed = true;
                 }
                 if(gamepad1.b && !intakePressed){

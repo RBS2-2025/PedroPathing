@@ -16,13 +16,13 @@ import java.util.concurrent.TimeUnit;
 @Configurable
 @TeleOp(name = "TurretTest",group = "test")
 public class TurretTest extends LinearOpMode {
-    public static double kP = 450;
+    public static double kP = 800;
     public static double kI = 0;
     public static double kD = 0;
-    public static double kF = 15;
+    public static double kF = 25;
     PIDFCoefficients coefficients;
     public static int PREHEAT_VELOCITY = 1000;
-    public static int VELOCITY = 1500;
+    public static int VELOCITY = 2100;
     public static boolean USE_PIXEL = false;
     int targetVeocity;
     int unit = 100;
@@ -89,7 +89,7 @@ public class TurretTest extends LinearOpMode {
                     outtakeTimer.reset();
                 }
                 if(outtakeResting){
-                    if(outtakeTimer.time(TimeUnit.SECONDS) > 2 + kP/100){
+                    if(outtakeTimer.time(TimeUnit.SECONDS) > 3){
                         outtakeResting = false;
                         targetVeocity = PREHEAT_VELOCITY;
                     }
