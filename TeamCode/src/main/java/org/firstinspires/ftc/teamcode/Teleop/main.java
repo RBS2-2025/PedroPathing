@@ -17,19 +17,25 @@ import org.firstinspires.ftc.teamcode.utils.PanelHelper;
 public class main extends LinearOpMode {
     DcMotor outtake, outtake2, intake, fl, fr, rl, rr;
     IMU imu;
-    Servo blocker;
+    Servo blocker, push;
     private ActionManaging_main action;
     PanelHelper p;
     private boolean Outtake_wasPressed = false;
     private boolean Intake_wasPressed = false;
     private boolean IntakeR_wasPressed = false;
     private boolean Blocking_wasPressed = false;
+    private boolean UnBlocking_wasPressed = false;
 
-    public static double power = 0.45;
-    public static double power2 = 0.85;
+    public static double power = 0.4;
+    public static double power2 = 0.75;
     public static double intakepower = 1.0;
-    public static double pos = 1;
+    public static double pos = 0.62;
+    public static double pushpos = 0; //0.57
 
+
+    // 0.4 /  0.75  !
+
+    // 0.4 / 0.8
     @Override
     public void runOpMode() {
         initialize();
@@ -38,11 +44,12 @@ public class main extends LinearOpMode {
 
         p = new PanelHelper(this);
 
-        action = new ActionManaging_main(outtake,outtake2,intake,blocker);
+        action = new ActionManaging_main(outtake,outtake2,intake,blocker,push);
 
         IMU_Driving imuDriving = new IMU_Driving(fl,fr,rl,rr,imu,telemetry,gamepad1);
 
         blocker.setPosition(pos);
+        push.setPosition(pushpos);
 
         while (opModeIsActive()) {
             p.updateGamepads();
@@ -52,53 +59,52 @@ public class main extends LinearOpMode {
             outtake();
             intake();
             intakeR();
-            blocking();
+
+            if (p.gamepad1.right_trigger > 0.5){
+                blocker.setPosition(pos);
+            }
+
+            if (p.gamepad1.left_trigger > 0.5){
+                push.setPosition(pushpos);
+            }else{
+                push.setPosition(0.5);
+            }
+
         }
 
     }
     void outtake(){
-        if (p.gamepad2.b) {
+        if (p.gamepad1.b) {
             action.outtake(power,power2);
             if (!Outtake_wasPressed) Outtake_wasPressed = true;
         }
 
-        if (!p.gamepad2.b && Outtake_wasPressed) {
+        if (!p.gamepad1.b && Outtake_wasPressed) {
             action.outtake_stop();
             Outtake_wasPressed = false;
         }
     }
 
     void intake(){
-        if (p.gamepad2.a) {
+        if (p.gamepad1.a) {
             action.intake(intakepower);
             if (!Intake_wasPressed) Intake_wasPressed = true;
         }
 
-        if (!p.gamepad2.a && Intake_wasPressed) {
+        if (!p.gamepad1.a && Intake_wasPressed) {
             action.intake_stop();
             Intake_wasPressed = false;
         }
     }
 
     void intakeR(){
-        if (p.gamepad2.x) {
+        if (p.gamepad1.x) {
             action.intake(intakepower*-1);
             if (!IntakeR_wasPressed) IntakeR_wasPressed = true;
         }
-        if (!p.gamepad2.x && IntakeR_wasPressed) {
+        if (!p.gamepad1.x && IntakeR_wasPressed) {
             action.intake_stop();
             IntakeR_wasPressed = false;
-        }
-    }
-
-    void blocking(){
-        if (p.gamepad2.y){
-            action.block();
-            if (!Blocking_wasPressed) Blocking_wasPressed = true;
-        }
-        if (!p.gamepad2.y && Blocking_wasPressed){
-            action.unblock();
-            Blocking_wasPressed = false;
         }
     }
 
@@ -136,6 +142,10 @@ public class main extends LinearOpMode {
 
         blocker = hardwareMap.get(Servo.class,"blocker");
         blocker.setDirection(Servo.Direction.REVERSE);
+
+        push = hardwareMap.get(Servo.class,"push");
+
+
 
     }
 }
