@@ -36,7 +36,7 @@ public class TurretControl {
 
         this.isBlue = blue;
         this.targetID = this.isBlue? 20 : 24;
-//        this.targetID = 21;
+//        this.targetID = 23;
         this.imu = imu;
 
 
@@ -53,7 +53,7 @@ public class TurretControl {
         limelight.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw());
         LLResult result = limelight.getLatestResult();
         if(!result.isValid()) {
-            panel.addData("status","not valid");
+//            panel.addData("status","not valid");
             if(Math.abs(turretMotor.getCurrentPosition()) < 20){
                 turretMotor.setPower(0);
                 return;
@@ -66,23 +66,24 @@ public class TurretControl {
         List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
         if(fiducialResults.isEmpty()) {
             turretMotor.setPower(0);
-            panel.addData("status","not found");
+//            panel.addData("status","not found");
             return;
         }
         for(LLResultTypes.FiducialResult fr : fiducialResults){
             if (fr.getFiducialId() != targetID) continue;
             turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             tx = fr.getTargetXDegrees() * speed;
+//            panel.addData("tx",tx);
             if(Math.abs(tx) < deadZone) {
                 turretMotor.setPower(0);
                 return;
             }
             double power = -tx;
-            panel.addData("tx",tx);
+
             if(Math.abs(power) > maxPower) {
                 power = Math.signum(power) * maxPower;
             }
-            panel.addData("power",power);
+//            panel.addData("power",power);
             if (turretMotor.getCurrentPosition() > 300) {
                 turretMotor.setPower(Math.min(0, power)); // +방향 차단
                 return;
@@ -98,7 +99,7 @@ public class TurretControl {
             turretMotor.setPower(0);
             return;
         }
-        panel.addData("status","skipped");
+//        panel.addData("status","skipped");
 
         turretMotor.setTargetPosition(0);
         turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);

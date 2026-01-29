@@ -16,9 +16,9 @@ import org.firstinspires.ftc.teamcode.utils.PanelsHelper;
 public class TrackingTest extends OpMode {
 
     public static double speed = 0.02;
-    public static double max_speed = 0.35;
+    public static double max_speed = 0.3;
     public static boolean reversed = false;
-    public static double d_zone = 0.2;
+    public static double d_zone = 0;
     Robot robot;
     DcMotorEx tracker;
     TurretControl control;

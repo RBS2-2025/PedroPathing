@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode.autonomous.test;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.geometry.BezierCurve;
@@ -10,7 +9,6 @@ import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.*;
-import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.enums.BLOCKSTATE;
 import org.firstinspires.ftc.teamcode.enums.INTAKESTATE;
@@ -19,12 +17,10 @@ import org.firstinspires.ftc.teamcode.enums.TRACKINGSTATE;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.hardware.TaskLogics;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
-import org.firstinspires.ftc.teamcode.utils.PanelsHelper;
 
-@Autonomous(name = "AutoTest", group = "Autonomous")
-@Configurable // Panels
+@Autonomous(name = "TaskTEST", group = "Autonomous")
+@Configurable // telemetry
 public class TaskTest extends OpMode {
-    PanelsHelper panels;
     public Follower follower; // Pedro Pathing follower instance
     private int pathState = 0; // Current autonomous path state (state machine)
     public static int useTask = 1;
@@ -37,7 +33,7 @@ public class TaskTest extends OpMode {
 
     @Override
     public void init() {
-
+//        telemetry = new telemetryHelper(this);
         follower = Constants.createFollower(hardwareMap);
         follower.setStartingPose(new Pose(72, 72, Math.toRadians(270)));
 
@@ -49,8 +45,8 @@ public class TaskTest extends OpMode {
         robot = new Robot(hardwareMap,true);
         task = new TaskLogics(robot,true);
 
-        panels.debug("Status: Initialized");
-        panels.update();
+//        telemetry.deb("Status", "Initialized");
+        telemetry.update();
     }
 
     @Override
@@ -59,12 +55,12 @@ public class TaskTest extends OpMode {
         autonomousPathUpdate(); // Update autonomous state machine
         task.loop(); // do task
 
-        // Log values to Panels and Driver Station
-        panels.addData("Path State", pathState);
-        panels.addData("X", follower.getPose().getX());
-        panels.addData("Y", follower.getPose().getY());
-        panels.addData("Heading", follower.getPose().getHeading());
-        panels.update();
+        // Log values to telemetry and Driver Stationtelemetry
+//        telemetry.addData("Path State", pathState);
+//        telemetry.addData("X", follower.getPose().getX());
+//        telemetry.addData("Y", follower.getPose().getY());
+//        telemetry.addData("Heading", follower.getPose().getHeading());
+//        telemetry.update();
     }
 
 
@@ -76,7 +72,8 @@ public class TaskTest extends OpMode {
         public PathChain Left;
         public PathChain Back;
         public PathChain Straight;
-
+        public PathChain LeftLong;
+        public PathChain RightLong;
         public Paths(Follower follower) {
             Home = follower.pathBuilder().addPath(
                             new BezierLine(
@@ -135,6 +132,24 @@ public class TaskTest extends OpMode {
                                     new Pose(72.000, 48.000)
                             )
                     ).setConstantHeadingInterpolation(Math.toRadians(270))
+
+                    .build();
+            LeftLong = follower.pathBuilder().addPath(
+                            new BezierLine(
+                                    new Pose(72.000, 72.000),
+
+                                    new Pose(130.000, 72.000)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(270), Math.toRadians(270))
+
+                    .build();
+            RightLong = follower.pathBuilder().addPath(
+                            new BezierLine(
+                                    new Pose(72.000, 72.000),
+
+                                    new Pose(20, 72.000)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(270), Math.toRadians(270))
 
                     .build();
         }
@@ -238,7 +253,87 @@ public class TaskTest extends OpMode {
                     setPathState(-1);
                 }
                 break;
-
+            case 12:
+                if(!follower.isBusy() && !task.isBusy()){
+                    followPath(paths.LeftLong,1,true);
+                    setPathState(-12);
+                }
+                break;
+            case -12:
+                if(!follower.isBusy() && !task.isBusy()){
+                    followPath(paths.Home,1,true);
+                    setPathState(12);
+                }
+                break;
+            case 13:
+                if(!follower.isBusy() && !task.isBusy()){
+                    followPath(paths.LeftLong,1,true);
+                    task.setOuttakeState(OUTTAKESTATE.SHOOT);
+                    setPathState(-13);
+                }
+                break;
+            case -13:
+                if(!follower.isBusy() && !task.isBusy()){
+                    followPath(paths.Home,1,true);
+                    setPathState(13);
+                }
+                break;
+            case 14:
+                if(!follower.isBusy() && !task.isBusy()){
+                    followPath(paths.LeftLong,1,true);
+                    task.setIntakeState(INTAKESTATE.INTAKE);
+                    setPathState(-14);
+                }
+                break;
+            case -14:
+                if(!follower.isBusy() && !task.isBusy()){
+                    followPath(paths.Home,1,true);
+                    setPathState(14);
+                }
+                break;
+            case 15:
+                if(!follower.isBusy() && !task.isBusy()){
+                    followPath(paths.LeftLong,1,true);
+                    task.setTrackingState(TRACKINGSTATE.TRACK);
+                    setPathState(-15);
+                }
+                break;
+            case -15:
+                if(!follower.isBusy() && !task.isBusy()){
+                    followPath(paths.Home,1,true);
+                    setPathState(15);
+                }
+                break;
+            case 16:
+                if(!follower.isBusy() && !task.isBusy()){
+                    followPath(paths.LeftLong,1,true);
+                    task.setOuttakeState(OUTTAKESTATE.PREHEAT);
+                    task.setIntakeState(INTAKESTATE.INTAKE);
+                    setPathState(-16);
+                }
+                break;
+            case -16:
+                if(!follower.isBusy() && !task.isBusy()){
+                    followPath(paths.Home,1,true);
+                    task.setIntakeState(INTAKESTATE.STOP);
+                    task.setOuttakeState(OUTTAKESTATE.SHOOT);
+                    if(pathTimer.getElapsedTimeSeconds() > 5){
+                        setPathState(16);
+                    }
+                }
+                break;
+            case 17:
+                if(!follower.isBusy() && !task.isBusy()){
+                    followPath(paths.RightLong,1,true);
+                    setPathState(-17);
+                }
+                break;
+            case -17:
+                if(!follower.isBusy() && !task.isBusy()){
+                    followPath(paths.Home,1,true);
+                    setPathState(17);
+                }
+                break;
             case -1:
                 //IDLE
                 if(!follower.isBusy() && !task.isBusy()){
@@ -246,7 +341,7 @@ public class TaskTest extends OpMode {
                     task.setBlockState(BLOCKSTATE.OPEN);
                     task.setOuttakeState(OUTTAKESTATE.REST);
                     task.setTrackingState(TRACKINGSTATE.STOP);
-                    panels.addData("status: ","complete");
+                    telemetry.addData("status: ","complete");
                 }
                 break;
 

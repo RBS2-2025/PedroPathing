@@ -21,12 +21,12 @@ import java.util.concurrent.TimeUnit;
 
 //TODO OUTTAKE -  PIDF, VELOCITY 넣기
 //TODO BLOCK - open, block position 넣기
-//TODO TRACKING - 로직 짜기
 public class TaskLogics {
 //vars
 //region hardware
     DcMotorEx intaker, shooter, tracker;
     Servo blocker;
+    Robot robot;
 //endregion hardware
 
 //region state
@@ -34,15 +34,23 @@ public class TaskLogics {
     OUTTAKESTATE outtakeState = OUTTAKESTATE.PREHEAT;
     TRACKINGSTATE trackingState = TRACKINGSTATE.IDLE;
     BLOCKSTATE blockState = BLOCKSTATE.IDLE;
+    OUTTAKEPOSITION positionState = OUTTAKEPOSITION.NEAR;
 //endregion state
 
 //region outtake
-    double SHOOTING_VELOCITY_NEAR = 1500;
-    double SHOOTING_VELOCITY_FAR = 2000;
+    double SHOOTING_VELOCITY_NEAR = 1700;
+    double SHOOTING_VELOCITY_FAR = 2500;
     double shooting_target_velocity;
-    double PREHEAT_VELOCITY = 500;
-    PIDFCoefficients outtakePIDF_near = new PIDFCoefficients(450,0,0,15);
-    PIDFCoefficients outakePIDF_far = new PIDFCoefficients(450,0,0,15);
+    double PREHEAT_VELOCITY = 1000;
+    PIDFCoefficients preheatPIDF = new PIDFCoefficients(300,0,0,20);
+    double preheatF = 20;
+    PIDFCoefficients outtakePIDF_near = new PIDFCoefficients(900,0,0,35);
+    double nearF = 35;
+    PIDFCoefficients outtakePIDF_far = new PIDFCoefficients(450,0,0,15);
+
+    double farF = 15;
+    public double feedDelay = 1;
+
 //endregion outtake
 
 //region tracker
@@ -50,8 +58,8 @@ public class TaskLogics {
 //endregion tracker
 
 //region block
-    double OPEN_POSITION = 0.56;
-    double BLOCK_POSITION = 0.44;
+    double OPEN_POSITION = 0.62;
+    double BLOCK_POSITION = 0.43;
 //endregion block
 
 //region panels
@@ -62,6 +70,7 @@ public class TaskLogics {
 
 
     public TaskLogics(Robot robot, boolean isBlue){
+        this.robot = robot;
         this.intaker = robot.intaker;
         this.shooter = robot.shooter;
         this.shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,this.outtakePIDF_near);
@@ -78,6 +87,8 @@ public class TaskLogics {
         this.setTrackingState(TRACKINGSTATE.RESET);
         this.setBlockState(BLOCKSTATE.BLOCK);
         changeOuttakePosition(OUTTAKEPOSITION.NEAR);
+        this.shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        this.tracker.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
     } // 기본 상태 (시작 시)
 
@@ -94,6 +105,9 @@ public class TaskLogics {
                 break;
             case STOP:
                 intake_stop();
+                break;
+            case FEED:
+                feed();
                 break;
         }
         switch (outtakeState){
@@ -216,21 +230,37 @@ public class TaskLogics {
         this.intaker.setPower(-0.6);
         this.setIntakeState(INTAKESTATE.IDLE);
     }
+    void feed(){
+        this.intaker.setPower(1);
+        this.setIntakeState(INTAKESTATE.IDLE);
+    }
 //endregion intake
 
 //region outtake
     void preheat(){
+        preheatPIDF.f = preheatF * 12 / this.robot.getVoltage();
+        this.shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,preheatPIDF);
         this.shooter.setVelocity(PREHEAT_VELOCITY);
     }
     void shoot(){
+        if(positionState == OUTTAKEPOSITION.NEAR){
+            outtakePIDF_near.f = nearF * 12 / this.robot.getVoltage();
+            this.shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,outtakePIDF_near);
+        }
+        else{
+            outtakePIDF_far.f = farF * 12 / this.robot.getVoltage();
+            this.shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,outtakePIDF_far);
+        }
         this.shooter.setVelocity(this.shooting_target_velocity);
-        if(this.timers.get(STATES.OUTTAKE).time(TimeUnit.SECONDS) > 0.5){
-            this.setIntakeState(INTAKESTATE.INTAKE);
+        if(this.timers.get(STATES.OUTTAKE).time(TimeUnit.SECONDS) > feedDelay){
+            this.setIntakeState(INTAKESTATE.FEED);
         }
     }
     void outtake_rest(){
         this.shooter.setPower(0);
-        this.setIntakeState(INTAKESTATE.STOP);
+        if(this.timers.get(STATES.OUTTAKE).time() < 0.5){
+            this.setIntakeState(INTAKESTATE.STOP);
+        }
         if(this.timers.get(STATES.OUTTAKE).time(TimeUnit.SECONDS) > 2){
             this.setOuttakeState(OUTTAKESTATE.PREHEAT);
         }
@@ -240,10 +270,12 @@ public class TaskLogics {
             case NEAR:
                 this.shooting_target_velocity = this.SHOOTING_VELOCITY_NEAR;
                 this.shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,this.outtakePIDF_near);
+                this.positionState = OUTTAKEPOSITION.NEAR;
                 break;
             case FAR:
                 this.shooting_target_velocity = this.SHOOTING_VELOCITY_FAR;
-                this.shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,this.outakePIDF_far);
+                this.shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,this.outtakePIDF_far);
+                this.positionState = OUTTAKEPOSITION.FAR;
                 break;
         }
         this.setOuttakeState(OUTTAKESTATE.PREHEAT);
@@ -252,13 +284,14 @@ public class TaskLogics {
 
 //region track
     void track(){
-        turretControl.align(0.4,false,0.1);
+        turretControl.align(0.35,false,0.02);
     }
     void track_reset(){
+        tracker.setPower(0);
         tracker.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         tracker.setTargetPosition(0);
         tracker.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        tracker.setPower(0.4);//max_power
+        tracker.setPower(0.35);//max_power
         if(Math.abs(tracker.getCurrentPosition()) < 10){
             setTrackingState(TRACKINGSTATE.IDLE);
         }
@@ -269,6 +302,12 @@ public class TaskLogics {
         this.setTrackingState(TRACKINGSTATE.IDLE);
     }
     void track_manual(boolean toRight){
+        if(tracker.getCurrentPosition() > 300 && toRight){
+            return;
+        }
+        if(tracker.getCurrentPosition() < -300 && !toRight){
+            return;
+        }
         tracker.setPower((toRight? 0.4: -0.4));
     }
 //endregion track

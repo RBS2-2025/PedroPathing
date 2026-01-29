@@ -4,5 +4,6 @@ public enum INTAKESTATE{
     IDLE,
     INTAKE,
     DISCHARGE,
-    STOP
+    STOP,
+    FEED
 }

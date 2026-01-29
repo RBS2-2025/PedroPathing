@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.VoltageSensor;
 
 public class Robot {
     public Limelight3A limelight;
@@ -16,7 +17,9 @@ public class Robot {
     public DcMotor lf,rf,lr,rr;
     public DcMotorEx intaker, shooter, tracker;
     public Servo blocker;
+    VoltageSensor voltageSensor;
     public Robot(HardwareMap hardwareMap,boolean useBevel){
+        this.voltageSensor = hardwareMap.voltageSensor.iterator().next();
         this.lf = hardwareMap.get(DcMotor.class, "lf");
         this.rf = hardwareMap.get(DcMotor.class, "rf");
         this.lr = hardwareMap.get(DcMotor.class, "lr");
@@ -49,5 +52,8 @@ public class Robot {
 
         this.limelight = hardwareMap.get(Limelight3A.class,"limelight");
         this.imu = hardwareMap.get(IMU.class,"imu");
+    }
+    public double getVoltage(){
+        return this.voltageSensor.getVoltage();
     }
 }
