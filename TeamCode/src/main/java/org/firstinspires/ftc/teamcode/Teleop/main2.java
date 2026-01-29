@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
 import static org.firstinspires.ftc.teamcode.Movement.ActionManaging_main.blockpos;
+import static org.firstinspires.ftc.teamcode.Movement.ActionManaging_main.unblockpos;
 import static org.firstinspires.ftc.teamcode.TEST.pidf.SHOOTING_VELOCITY;
 import static org.firstinspires.ftc.teamcode.TEST.pidf.SHOOTING_VELOCITY2;
 
@@ -40,6 +41,12 @@ public class main2 extends LinearOpMode {
     public static double unpushpos = 0.51; //0.57
 
 
+    public static double SHOOTING_VELOCITY = 2100;
+    public static double PREHEAT_VELOCITY  = 1000;
+    public static double SHOOTING_VELOCITY2 = 2100;
+    public static double PREHEAT_VELOCITY2  = 1000;
+    double curTargetVelocity = PREHEAT_VELOCITY;
+    double curTargetVelocity2 = PREHEAT_VELOCITY2;
 
     // 0.4 /  0.75  !
 
@@ -62,48 +69,36 @@ public class main2 extends LinearOpMode {
         while (opModeIsActive()) {
             p.updateGamepads();
 
-            action.updateFlywheelPIDF(hardwareMap.voltageSensor.iterator().next().getVoltage());
 
             imuDriving.controlWithPad(IMU_Driving.GamepadPurpose.WHOLE);
             outtakeM();
 
-            outtake();
             intake();
             intakeR();
+            blocker();
+            push();
+
+            telemetry.addData("current", curTargetVelocity);
+            telemetry.addData("current2", curTargetVelocity2);
 
             telemetry.addData("velocity", outtake.getVelocity());
-            telemetry.addData("error", SHOOTING_VELOCITY-outtake.getVelocity());
+            telemetry.addData("error", curTargetVelocity-outtake.getVelocity());
             telemetry.addData("velocity2", outtake2.getVelocity());
-            telemetry.addData("error2", SHOOTING_VELOCITY2-outtake2.getVelocity());
+            telemetry.addData("error2", curTargetVelocity2-outtake2.getVelocity());
 
-            if (p.gamepad1.right_trigger > 0.5){
-                blocker.setPosition(blockpos);
+            if (p.gamepad1.right_stick_button){
+                curTargetVelocity = SHOOTING_VELOCITY;
+                curTargetVelocity2 = SHOOTING_VELOCITY2;
             }
-
-
-            if (p.gamepad1.left_trigger > 0.5){
-                push.setPosition(pushpos);
-            }else{
-                push.setPosition(unpushpos);
+            if (p.gamepad1.left_bumper){
+                curTargetVelocity = PREHEAT_VELOCITY;
+                curTargetVelocity2 = PREHEAT_VELOCITY2;
             }
-
             telemetry.update();
 
         }
 
     }
-    void outtake(){
-        if (p.gamepad1.b) {
-            action.outtake(power,power2);
-            if (!Outtake_wasPressed) Outtake_wasPressed = true;
-        }
-
-        if (!p.gamepad1.b && Outtake_wasPressed) {
-            action.outtake_stop();
-            Outtake_wasPressed = false;
-        }
-    }
-
     void outtakeM() {
         if (p.gamepad1.y && !lastY) {
             isOuttakeOn = !isOuttakeOn;
@@ -111,20 +106,15 @@ public class main2 extends LinearOpMode {
         lastY = p.gamepad1.y;
 
         if (isOuttakeOn) {
-//            outtake.setPower(power);
-//            outtake2.setPower(power2);
-            outtake.setVelocity(SHOOTING_VELOCITY);
-            outtake2.setVelocity(SHOOTING_VELOCITY2);
-
-            blocker.setPosition(pos);
+            outtake.setVelocity(curTargetVelocity);
+            outtake2.setVelocity(curTargetVelocity2);
+            action.updateFlywheelPIDF(hardwareMap.voltageSensor.iterator().next().getVoltage());
         } else {
             outtake.setVelocity(0);
             outtake2.setVelocity(0);
-//            outtake.setPower(0);
-//            outtake2.setPower(0);
         }
     }
-
+// 16 20
     void intake(){
         if (p.gamepad1.a) {
             action.intake(intakepower);
@@ -146,6 +136,22 @@ public class main2 extends LinearOpMode {
         if (!p.gamepad1.x && IntakeR_wasPressed) {
             action.intake_stop();
             IntakeR_wasPressed = false;
+        }
+    }
+
+    void blocker(){
+        if (p.gamepad1.right_trigger > 0.5){
+            blocker.setPosition(blockpos);
+        }else{
+            blocker.setPosition(unblockpos);
+        }
+    }
+
+    void push(){
+        if (p.gamepad1.left_trigger > 0.5){
+            push.setPosition(pushpos);
+        }else{
+            push.setPosition(unpushpos);
         }
     }
 

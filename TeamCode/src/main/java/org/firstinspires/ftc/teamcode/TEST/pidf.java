@@ -26,11 +26,11 @@ public class pidf extends OpMode {
 
     double curTargetVelocity = PREHEAT_VELOCITY;
     double curTargetVelocity2 = PREHEAT_VELOCITY2;
-    public static double F = 16; //15.5
-    public static double P = 16;
+    public static double F = 15; //15.5
+    public static double P = 23;
 
-    public static double F2 = 5; //15.5
-    public static double P2 = 5;
+    public static double F2 = 15; //15.5
+    public static double P2 = 23;
 
     // 16 16 / 5 5 / 2100 2100
     //block 0.35
