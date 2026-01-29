@@ -17,20 +17,24 @@ public class pidf extends OpMode {
     private static final double NOMINAL_VOLTAGE = 12.0;
 
     public DcMotorEx outtake, outtake2 ;
-    public static double SHOOTING_VELOCITY = 2000;
+    public static double SHOOTING_VELOCITY = 2100;
     public static double PREHEAT_VELOCITY  = 1000;
-    public static double SHOOTING_VELOCITY2 = 2000;
+    public static double SHOOTING_VELOCITY2 = 2100;
     public static double PREHEAT_VELOCITY2  = 1000;
 
     private boolean Outtake_wasPressed = false;
 
     double curTargetVelocity = PREHEAT_VELOCITY;
-    double curTargetVelocity2 = PREHEAT_VELOCITY;
-    public static double F = 0; //15.5
-    public static double P = 0;
+    double curTargetVelocity2 = PREHEAT_VELOCITY2;
+    public static double F = 16; //15.5
+    public static double P = 16;
 
-    public static double F2 = 0; //15.5
-    public static double P2 = 0;
+    public static double F2 = 5; //15.5
+    public static double P2 = 5;
+
+    // 16 16 / 5 5 / 2100 2100
+    //block 0.35
+    // push 0.54
 
     double[] stepSizes = {10.0, 1.0, 0.1, 0.001};
 
@@ -57,16 +61,13 @@ public class pidf extends OpMode {
     public void loop() {
         if(gamepad1.yWasPressed()) {
             curTargetVelocity = SHOOTING_VELOCITY;
+            curTargetVelocity2 = SHOOTING_VELOCITY2;
+
         }
         if(gamepad1.xWasPressed()) {
             curTargetVelocity = PREHEAT_VELOCITY;
-        }
-
-        if(gamepad1.leftStickButtonWasPressed()) {
-            curTargetVelocity2 = SHOOTING_VELOCITY2;
-        }
-        if(gamepad1.rightStickButtonWasPressed()) {
             curTargetVelocity2 = PREHEAT_VELOCITY2;
+
         }
 
         if(gamepad1.bWasPressed()) {

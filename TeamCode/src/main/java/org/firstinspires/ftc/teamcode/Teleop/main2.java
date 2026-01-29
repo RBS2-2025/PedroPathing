@@ -1,10 +1,12 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
 import static org.firstinspires.ftc.teamcode.Movement.ActionManaging_main.blockpos;
-import static org.firstinspires.ftc.teamcode.Movement.ActionManaging_main.unblockpos;
+import static org.firstinspires.ftc.teamcode.TEST.pidf.SHOOTING_VELOCITY;
+import static org.firstinspires.ftc.teamcode.TEST.pidf.SHOOTING_VELOCITY2;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.qualcomm.robotcore.eventloop.opmode.*;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -17,7 +19,7 @@ import org.firstinspires.ftc.teamcode.utils.PanelHelper;
 
 @Configurable
 @TeleOp
-public class main extends LinearOpMode {
+public class main2 extends LinearOpMode {
     DcMotor intake, fl, fr, rl, rr;
     DcMotorEx outtake, outtake2;
     IMU imu;
@@ -36,6 +38,7 @@ public class main extends LinearOpMode {
     public static double pos = 0.62;
     public static double pushpos = 0.545; //0.57
     public static double unpushpos = 0.51; //0.57
+
 
 
     // 0.4 /  0.75  !
@@ -59,12 +62,19 @@ public class main extends LinearOpMode {
         while (opModeIsActive()) {
             p.updateGamepads();
 
+            action.updateFlywheelPIDF(hardwareMap.voltageSensor.iterator().next().getVoltage());
+
             imuDriving.controlWithPad(IMU_Driving.GamepadPurpose.WHOLE);
             outtakeM();
 
             outtake();
             intake();
             intakeR();
+
+            telemetry.addData("velocity", outtake.getVelocity());
+            telemetry.addData("error", SHOOTING_VELOCITY-outtake.getVelocity());
+            telemetry.addData("velocity2", outtake2.getVelocity());
+            telemetry.addData("error2", SHOOTING_VELOCITY2-outtake2.getVelocity());
 
             if (p.gamepad1.right_trigger > 0.5){
                 blocker.setPosition(blockpos);
@@ -76,6 +86,8 @@ public class main extends LinearOpMode {
             }else{
                 push.setPosition(unpushpos);
             }
+
+            telemetry.update();
 
         }
 
@@ -99,12 +111,17 @@ public class main extends LinearOpMode {
         lastY = p.gamepad1.y;
 
         if (isOuttakeOn) {
-            outtake.setPower(power);
-            outtake2.setPower(power2);
+//            outtake.setPower(power);
+//            outtake2.setPower(power2);
+            outtake.setVelocity(SHOOTING_VELOCITY);
+            outtake2.setVelocity(SHOOTING_VELOCITY2);
+
             blocker.setPosition(pos);
         } else {
-            outtake.setPower(0);
-            outtake2.setPower(0);
+            outtake.setVelocity(0);
+            outtake2.setVelocity(0);
+//            outtake.setPower(0);
+//            outtake2.setPower(0);
         }
     }
 
