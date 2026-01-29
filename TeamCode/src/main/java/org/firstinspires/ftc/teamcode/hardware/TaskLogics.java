@@ -38,7 +38,7 @@ public class TaskLogics {
 //endregion state
 
 //region outtake
-    double SHOOTING_VELOCITY_NEAR = 1700;
+    double SHOOTING_VELOCITY_NEAR = 2000;
     double SHOOTING_VELOCITY_FAR = 2500;
     double shooting_target_velocity;
     double PREHEAT_VELOCITY = 1000;
@@ -58,7 +58,7 @@ public class TaskLogics {
 //endregion tracker
 
 //region block
-    double OPEN_POSITION = 0.62;
+    double OPEN_POSITION = 0.6;
     double BLOCK_POSITION = 0.43;
 //endregion block
 
