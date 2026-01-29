@@ -4,11 +4,16 @@ import static org.firstinspires.ftc.teamcode.TEST.pidf.F;
 import static org.firstinspires.ftc.teamcode.TEST.pidf.F2;
 import static org.firstinspires.ftc.teamcode.TEST.pidf.P;
 import static org.firstinspires.ftc.teamcode.TEST.pidf.P2;
+import static org.firstinspires.ftc.teamcode.Teleop.main2.curTargetVelocity;
+import static org.firstinspires.ftc.teamcode.Teleop.main2.curTargetVelocity2;
+import static org.firstinspires.ftc.teamcode.Teleop.main2.pushpos;
+import static org.firstinspires.ftc.teamcode.Teleop.main2.unpushpos;
 
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -19,6 +24,7 @@ public class ActionManaging_main {
     public DcMotor intake;
     public DcMotorEx outtake, outtake2;
     public Servo blocker,push;
+    public HardwareMap hardwareMap;
     private ElapsedTime timer = new ElapsedTime();
 
     private boolean outtakeActive = false;
@@ -39,13 +45,15 @@ public class ActionManaging_main {
             DcMotorEx outtake2,
             DcMotor intake,
             Servo blocker,
-            Servo push
+            Servo push,
+            HardwareMap hardwareMap
     ) {
         this.outtake = outtake;
         this.outtake2 = outtake2;
         this.intake = intake;
         this.blocker = blocker;
         this.push = push;
+        this.hardwareMap = hardwareMap;
     }
     public void block() {
         blocker.setPosition(blockpos);
@@ -86,42 +94,30 @@ public class ActionManaging_main {
         );
     }
    // outtake
-   public void outtake(double power1, double power2) {
-       if (!outtakeActive) {
-           outtake.setPower(power1);
-           outtake2.setPower(power2);
-
-           timer.reset();
-           outtakeActive = true;
-       }
-
-       double currentTime = timer.seconds();
-       if (currentTime >= blockerdelay) {
-           unblock();
-       }
-
-       if (currentTime >= intakeDelay) {
-           double timeSinceFeedStarted = currentTime - intakeDelay;
-           double cycleTime = feedOnTime + feedOffTime;
-           double timeInCycle = timeSinceFeedStarted % cycleTime;
-
-           if (timeInCycle < feedOnTime) {
-               intake.setPower(intakePower);
-           } else {
-               intake.setPower(0);
-           }
-       } else {
-           intake.setPower(0);
-       }
-   }
-
-    public void outtake_stop() {
-        outtake.setPower(0);
-        outtake2.setPower(0);
-
-        intake.setPower(0);
-        push.setPosition(0.5);
-        block();
-        outtakeActive = false;
+    public void outtake(double v1,double v2){
+        outtake.setVelocity(v1);
+        outtake2.setVelocity(v2);
+        updateFlywheelPIDF(hardwareMap.voltageSensor.iterator().next().getVoltage());
     }
+
+    public void outtake_stop(){
+        outtake.setVelocity(0);
+        outtake2.setVelocity(0);
+    }
+    public void outtake1(){ // 구상중
+        block();
+        intake(1.0);
+        //1초
+        intake_stop();
+        unblock();
+        outtake(1000,1000);
+        //4초
+        outtake(2000,2000);
+        push.setPosition(pushpos);
+        push.setPosition(unpushpos);
+
+        //4초
+
+    }
+
 }

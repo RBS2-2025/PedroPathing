@@ -14,8 +14,6 @@ import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 @Configurable
 @TeleOp
 public class pidf extends OpMode {
-    private static final double NOMINAL_VOLTAGE = 12.0;
-
     public DcMotorEx outtake, outtake2 ;
     public static double SHOOTING_VELOCITY = 2100;
     public static double PREHEAT_VELOCITY  = 1000;
@@ -26,11 +24,11 @@ public class pidf extends OpMode {
 
     double curTargetVelocity = PREHEAT_VELOCITY;
     double curTargetVelocity2 = PREHEAT_VELOCITY2;
-    public static double F = 15; //15.5
-    public static double P = 23;
+    public static double F = 16; //15.5
+    public static double P = 21;
 
-    public static double F2 = 15; //15.5
-    public static double P2 = 23;
+    public static double F2 = 16; //15.5
+    public static double P2 = 21;
 
     // 16 16 / 5 5 / 2100 2100
     //block 0.35

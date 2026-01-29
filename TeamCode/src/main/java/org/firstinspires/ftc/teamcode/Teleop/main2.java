@@ -45,8 +45,8 @@ public class main2 extends LinearOpMode {
     public static double PREHEAT_VELOCITY  = 1000;
     public static double SHOOTING_VELOCITY2 = 2100;
     public static double PREHEAT_VELOCITY2  = 1000;
-    double curTargetVelocity = PREHEAT_VELOCITY;
-    double curTargetVelocity2 = PREHEAT_VELOCITY2;
+    public static double curTargetVelocity = PREHEAT_VELOCITY;
+    public static double curTargetVelocity2 = PREHEAT_VELOCITY2;
 
     // 0.4 /  0.75  !
 
@@ -59,7 +59,7 @@ public class main2 extends LinearOpMode {
 
         p = new PanelHelper(this);
 
-        action = new ActionManaging_main(outtake,outtake2,intake,blocker,push);
+        action = new ActionManaging_main(outtake,outtake2,intake,blocker,push,this.hardwareMap);
 
         IMU_Driving imuDriving = new IMU_Driving(fl,fr,rl,rr,imu,telemetry,gamepad1);
 
@@ -68,7 +68,6 @@ public class main2 extends LinearOpMode {
 
         while (opModeIsActive()) {
             p.updateGamepads();
-
 
             imuDriving.controlWithPad(IMU_Driving.GamepadPurpose.WHOLE);
             outtakeM();
@@ -106,12 +105,9 @@ public class main2 extends LinearOpMode {
         lastY = p.gamepad1.y;
 
         if (isOuttakeOn) {
-            outtake.setVelocity(curTargetVelocity);
-            outtake2.setVelocity(curTargetVelocity2);
-            action.updateFlywheelPIDF(hardwareMap.voltageSensor.iterator().next().getVoltage());
+            action.outtake(curTargetVelocity,curTargetVelocity2);
         } else {
-            outtake.setVelocity(0);
-            outtake2.setVelocity(0);
+            action.outtake_stop();
         }
     }
 // 16 20
