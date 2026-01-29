@@ -33,6 +33,7 @@ public class TeleOpMainBlue extends OpMode {
         this.imuDriving = new IMUDriving(hardwareMap,panel,gamepad1);
         this.task = new TaskLogics(this.robot,true);
         this.task.panel = this.panel;
+        this.imuDriving.speed=0.7;
     }
 
     @Override
@@ -78,7 +79,11 @@ public class TeleOpMainBlue extends OpMode {
         //endregion x - discharge
         //region y - change PIDF and velocity
         if(gamepad2.yWasPressed()){
-            task.setOuttakeState(OUTTAKESTATE.TOGGLE_POSITION);
+//            task.setOuttakeState(OUTTAKESTATE.TOGGLE_POSITION);
+            task.setTrackingState(TRACKINGSTATE.TRACK);
+        }
+        if (gamepad2.yWasReleased()){
+            task.setTrackingState(TRACKINGSTATE.RESET);
         }
         //endregion y - change PIDF and velocity
         //region dpad_l - rotate turret L

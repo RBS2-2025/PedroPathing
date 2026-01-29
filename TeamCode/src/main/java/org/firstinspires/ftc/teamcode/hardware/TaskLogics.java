@@ -38,7 +38,7 @@ public class TaskLogics {
 //endregion state
 
 //region outtake
-    double SHOOTING_VELOCITY_NEAR = 2000;
+    double SHOOTING_VELOCITY_NEAR = 2100;
     double SHOOTING_VELOCITY_FAR = 2500;
     double shooting_target_velocity;
     double PREHEAT_VELOCITY = 1000;
@@ -49,7 +49,7 @@ public class TaskLogics {
     PIDFCoefficients outtakePIDF_far = new PIDFCoefficients(450,0,0,15);
 
     double farF = 15;
-    public double feedDelay = 1;
+    public double feedDelay = 2;
 
 //endregion outtake
 
