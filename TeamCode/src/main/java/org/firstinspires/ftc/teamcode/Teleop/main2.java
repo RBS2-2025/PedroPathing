@@ -53,21 +53,18 @@ public class main2 extends LinearOpMode {
     // 0.4 / 0.8
     @Override
     public void runOpMode() {
-        initialize();
-
         waitForStart();
 
-        p = new PanelHelper(this);
-
-        action = new ActionManaging_main(outtake,outtake2,intake,blocker,push,this.hardwareMap);
+        initialize();
 
         IMU_Driving imuDriving = new IMU_Driving(fl,fr,rl,rr,imu,telemetry,gamepad1);
 
-        blocker.setPosition(pos);
-        push.setPosition(pushpos);
+        action = new ActionManaging_main(outtake,outtake2,intake,blocker,push,this.hardwareMap);
+
+        imuDriving.init();
+        imuDriving.getYaw();
 
         while (opModeIsActive()) {
-            p.updateGamepads();
 
             imuDriving.controlWithPad(IMU_Driving.GamepadPurpose.WHOLE);
             outtakeM();
@@ -85,11 +82,11 @@ public class main2 extends LinearOpMode {
             telemetry.addData("velocity2", outtake2.getVelocity());
             telemetry.addData("error2", curTargetVelocity2-outtake2.getVelocity());
 
-            if (p.gamepad1.right_stick_button){
+            if (gamepad1.right_stick_button){
                 curTargetVelocity = SHOOTING_VELOCITY;
                 curTargetVelocity2 = SHOOTING_VELOCITY2;
             }
-            if (p.gamepad1.left_bumper){
+            if (gamepad1.left_bumper){
                 curTargetVelocity = PREHEAT_VELOCITY;
                 curTargetVelocity2 = PREHEAT_VELOCITY2;
             }
@@ -99,10 +96,10 @@ public class main2 extends LinearOpMode {
 
     }
     void outtakeM() {
-        if (p.gamepad1.y && !lastY) {
+        if (gamepad1.y && !lastY) {
             isOuttakeOn = !isOuttakeOn;
         }
-        lastY = p.gamepad1.y;
+        lastY = gamepad1.y;
 
         if (isOuttakeOn) {
             action.outtake(curTargetVelocity,curTargetVelocity2);
@@ -112,12 +109,12 @@ public class main2 extends LinearOpMode {
     }
 // 16 20
     void intake(){
-        if (p.gamepad1.a) {
+        if (gamepad1.a) {
             action.intake(intakepower);
             if (!Intake_wasPressed) Intake_wasPressed = true;
         }
 
-        if (!p.gamepad1.a && Intake_wasPressed) {
+        if (!gamepad1.a && Intake_wasPressed) {
             action.intake_stop();
             Intake_wasPressed = false;
         }
@@ -125,18 +122,18 @@ public class main2 extends LinearOpMode {
 
 
     void intakeR(){
-        if (p.gamepad1.x) {
+        if (gamepad1.x) {
             action.intake(intakepower*-1);
             if (!IntakeR_wasPressed) IntakeR_wasPressed = true;
         }
-        if (!p.gamepad1.x && IntakeR_wasPressed) {
+        if (!gamepad1.x && IntakeR_wasPressed) {
             action.intake_stop();
             IntakeR_wasPressed = false;
         }
     }
 
     void blocker(){
-        if (p.gamepad1.right_trigger > 0.5){
+        if (gamepad1.right_trigger > 0.5){
             blocker.setPosition(blockpos);
         }else{
             blocker.setPosition(unblockpos);
@@ -144,7 +141,7 @@ public class main2 extends LinearOpMode {
     }
 
     void push(){
-        if (p.gamepad1.left_trigger > 0.5){
+        if (gamepad1.left_trigger > 0.5){
             push.setPosition(pushpos);
         }else{
             push.setPosition(unpushpos);
@@ -157,7 +154,6 @@ public class main2 extends LinearOpMode {
         rl = hardwareMap.dcMotor.get("rl");
         rr = hardwareMap.dcMotor.get("rr");
         imu = hardwareMap.get(IMU.class,"imu");
-
 
         fl.setDirection(DcMotorSimple.Direction.REVERSE);
         rl.setDirection(DcMotorSimple.Direction.REVERSE);
