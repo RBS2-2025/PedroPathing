@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
+import static org.firstinspires.ftc.teamcode.Movement.ActionManaging_main.blockpos;
+import static org.firstinspires.ftc.teamcode.Movement.ActionManaging_main.unblockpos;
+
 import com.bylazar.configurables.annotations.Configurable;
 import com.qualcomm.robotcore.eventloop.opmode.*;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -23,14 +26,14 @@ public class main extends LinearOpMode {
     private boolean Outtake_wasPressed = false;
     private boolean Intake_wasPressed = false;
     private boolean IntakeR_wasPressed = false;
-    private boolean Blocking_wasPressed = false;
-    private boolean UnBlocking_wasPressed = false;
+    private boolean isOuttakeOn = false;
+    private boolean lastY = false;
 
     public static double power = 0.4;
     public static double power2 = 0.75;
     public static double intakepower = 1.0;
     public static double pos = 0.62;
-    public static double pushpos = 0; //0.57
+    public static double pushpos = 0.545; //0.57
 
 
     // 0.4 /  0.75  !
@@ -55,14 +58,16 @@ public class main extends LinearOpMode {
             p.updateGamepads();
 
             imuDriving.controlWithPad(IMU_Driving.GamepadPurpose.WHOLE);
+            outtakeM();
 
             outtake();
             intake();
             intakeR();
 
             if (p.gamepad1.right_trigger > 0.5){
-                blocker.setPosition(pos);
+                blocker.setPosition(blockpos);
             }
+
 
             if (p.gamepad1.left_trigger > 0.5){
                 push.setPosition(pushpos);
@@ -85,6 +90,22 @@ public class main extends LinearOpMode {
         }
     }
 
+    void outtakeM() {
+        if (p.gamepad1.y && !lastY) {
+            isOuttakeOn = !isOuttakeOn;
+        }
+        lastY = p.gamepad1.y;
+
+        if (isOuttakeOn) {
+            outtake.setPower(power);
+            outtake2.setPower(power2);
+            blocker.setPosition(pos);
+        } else {
+            outtake.setPower(0);
+            outtake2.setPower(0);
+        }
+    }
+
     void intake(){
         if (p.gamepad1.a) {
             action.intake(intakepower);
@@ -96,6 +117,7 @@ public class main extends LinearOpMode {
             Intake_wasPressed = false;
         }
     }
+
 
     void intakeR(){
         if (p.gamepad1.x) {

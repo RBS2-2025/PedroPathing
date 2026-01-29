@@ -49,7 +49,7 @@ public class ActionManaging_main {
 
     public void intake(double power) {
         intake.setPower(power);
-        block();
+//        block();
     }
 
     public void intake_stop() {
@@ -61,7 +61,6 @@ public class ActionManaging_main {
        if (!outtakeActive) {
            outtake.setPower(power1);
            outtake2.setPower(power2);
-
 
            timer.reset();
            outtakeActive = true;
