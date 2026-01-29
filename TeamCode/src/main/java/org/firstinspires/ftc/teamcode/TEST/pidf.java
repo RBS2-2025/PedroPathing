@@ -97,7 +97,7 @@ public class pidf extends OpMode {
         outtake.setVelocity(curTargetVelocity);
 
         double curVelocity2 = outtake2.getVelocity();
-        double curVelocity = outtake2.getVelocity();
+        double curVelocity = outtake.getVelocity();
         double error = curTargetVelocity - curVelocity;
         double error2 = curTargetVelocity2 - curVelocity2;
 
