@@ -34,7 +34,7 @@ public class ActionManaging_main {
     public static double feedOnTime = 1.3;
     public static double feedOffTime = 0.25; // 2초 멈추기
     public static double blockerdelay = 2.0;
-    public static double blockpos = 0.35;
+    public static double blockpos = 0.38;
     public static double unblockpos = 0.62;
     public static double tried = 0;
 

@@ -8,14 +8,22 @@ public class Mecanum_Driving {
 
     DcMotor fl, fr, rl, rr;
 
+    // 속도 계수 (0 ~ 1)
+    double speedMultiplier = 1.0;
+
     public Mecanum_Driving(HardwareMap hardwareMap) {
         fl = hardwareMap.get(DcMotor.class, "fl");
         fr = hardwareMap.get(DcMotor.class, "fr");
         rl = hardwareMap.get(DcMotor.class, "rl");
         rr = hardwareMap.get(DcMotor.class, "rr");
 
-        fr.setDirection(DcMotorSimple.Direction.REVERSE);
-        rr.setDirection(DcMotorSimple.Direction.REVERSE);
+        fl.setDirection(DcMotorSimple.Direction.REVERSE);
+        rl.setDirection(DcMotorSimple.Direction.REVERSE);
+    }
+
+    // 외부에서 속도 조절
+    public void setSpeed(double speed) {
+        speedMultiplier = Math.max(0.0, Math.min(speed, 1.0));
     }
 
     public void drive(double y, double x, double rx) {
@@ -37,10 +45,11 @@ public class Mecanum_Driving {
             rrPower /= max;
         }
 
-        fl.setPower(flPower);
-        fr.setPower(frPower);
-        rl.setPower(rlPower);
-        rr.setPower(rrPower);
+        // ⭐ 속도 계수 적용
+        fl.setPower(flPower * speedMultiplier);
+        fr.setPower(frPower * speedMultiplier);
+        rl.setPower(rlPower * speedMultiplier);
+        rr.setPower(rrPower * speedMultiplier);
     }
 
     public void stop() {
