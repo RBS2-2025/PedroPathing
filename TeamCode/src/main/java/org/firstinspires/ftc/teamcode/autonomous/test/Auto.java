@@ -1,6 +1,7 @@
 
 package org.firstinspires.ftc.teamcode.autonomous.test;
 
+import com.google.gson.Gson;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -8,6 +9,7 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.TelemetryManager;
 import com.bylazar.telemetry.PanelsTelemetry;
 
+import org.firstinspires.ftc.robotcore.internal.system.AppUtil;
 import org.firstinspires.ftc.teamcode.enums.INTAKESTATE;
 import org.firstinspires.ftc.teamcode.enums.OUTTAKESTATE;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
@@ -18,6 +20,8 @@ import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.follower.Follower;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.geometry.Pose;
+
+import java.io.File;
 
 @Autonomous(name = "Blue Auto 12", group = "Autonomous")
 @Configurable // Panels
@@ -344,7 +348,10 @@ public class Auto extends OpMode {
 //                break;
             case -1:
                 //IDLE
-                panelsTelemetry.addData("status: ","complete");
+                if(!follower.isBusy()){
+                    panelsTelemetry.addData("status: ","complete");
+                }
+
                 break;
 
         }
