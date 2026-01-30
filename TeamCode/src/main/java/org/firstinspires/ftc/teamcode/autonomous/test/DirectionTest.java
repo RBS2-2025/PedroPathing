@@ -22,8 +22,6 @@ public class DirectionTest extends OpMode {
     public Follower follower; // Pedro Pathing follower instance
     private int pathState = 0; // Current autonomous path state (state machine)
     private Timer pathTimer;
-    Robot robot;
-    TaskLogicsOld task;
     double angle;
     double x,y = 0;
 
@@ -34,7 +32,7 @@ public class DirectionTest extends OpMode {
         panelsTelemetry = PanelsTelemetry.INSTANCE.getTelemetry();
 
         follower = Constants.createFollower(hardwareMap);
-        follower.setStartingPose(new Pose(25, 129, Math.toRadians(144)));
+        follower.setStartingPose(new Pose(0, 0, Math.toRadians(0)));
 
 
 
@@ -44,7 +42,6 @@ public class DirectionTest extends OpMode {
         angle = Math.toDegrees(follower.getPose().getHeading());
         x = follower.getPose().getX();
         y = follower.getPose().getY();
-        this.task.start();
         panelsTelemetry.debug("Status", "Initialized");
         panelsTelemetry.addData("angle",angle);
         panelsTelemetry.addData("(x,y)","c");
@@ -58,9 +55,9 @@ public class DirectionTest extends OpMode {
 
         // Log values to Panels and Driver Station
         panelsTelemetry.debug("Path State", pathState);
-        panelsTelemetry.debug("X", follower.getPose().getX());
-        panelsTelemetry.debug("Y", follower.getPose().getY());
-        panelsTelemetry.debug("Heading", follower.getPose().getHeading());
+        panelsTelemetry.addData("X", follower.getPose().getX());
+        panelsTelemetry.addData("Y", follower.getPose().getY());
+        panelsTelemetry.addData("Heading", Math.toDegrees(follower.getPose().getHeading()));
         panelsTelemetry.update(telemetry);
     }
 

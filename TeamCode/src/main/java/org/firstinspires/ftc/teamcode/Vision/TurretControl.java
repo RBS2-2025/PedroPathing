@@ -63,6 +63,15 @@ public class TurretControl {
 
         int targetTicks = (int) (finalTargetDeg * TICKS_PER_DEGREE); // 모터 명령부
 
+        //regulation
+        if (turretMotor.getCurrentPosition() > 300) {
+            turretMotor.setPower(Math.min(0, targetTicks)); // +방향 차단
+            return;
+        }
+        if (turretMotor.getCurrentPosition() < -300) {
+            turretMotor.setPower(Math.max(0, targetTicks)); // -방향 차단
+            return;
+        }
         turretMotor.setTargetPosition(targetTicks);
     }
 
