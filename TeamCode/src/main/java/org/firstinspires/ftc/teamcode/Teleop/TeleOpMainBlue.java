@@ -23,7 +23,7 @@ public class TeleOpMainBlue extends OpMode {
     boolean leftBumperWasPressed = false;
     boolean rightDpadWasPressed = false;
     boolean leftDpadWasPressed = false;
-
+    boolean leftPressed = false;
 
 
     @Override
@@ -61,12 +61,12 @@ public class TeleOpMainBlue extends OpMode {
         if(gamepad2.bWasPressed()){
             task.setBlockState(BLOCKSTATE.OPEN);
             task.setOuttakeState(OUTTAKESTATE.SHOOT);
-            task.setTrackingState(TRACKINGSTATE.TRACK);
+//            task.setTrackingState(TRACKINGSTATE.TRACK);
         }
         if(gamepad2.bWasReleased()){
             task.setOuttakeState(OUTTAKESTATE.REST);
-            task.setTrackingState(TRACKINGSTATE.RESET);
-            task.setBlockState(BLOCKSTATE.BLOCK);
+//            task.setTrackingState(TRACKINGSTATE.RESET);
+//            task.setBlockState(BLOCKSTATE.BLOCK);
         }
         //endregion b - shoot
         //region x - discharge
@@ -78,9 +78,9 @@ public class TeleOpMainBlue extends OpMode {
         }
         //endregion x - discharge
         //region y - change PIDF and velocity
-//        if(gamepad2.yWasPressed()){
-//            task.setBlockState(BLOCKSTATE.BLOCK);
-//        }
+        if(gamepad2.yWasPressed()){
+            task.setBlockState(BLOCKSTATE.BLOCK);
+        }
         //endregion y - change PIDF and velocity
         //region dpad_l - rotate turret L
         if(gamepad2.dpad_left && !leftDpadWasPressed){
@@ -102,6 +102,15 @@ public class TeleOpMainBlue extends OpMode {
             task.setTrackingState(TRACKINGSTATE.STOP);
         }
         //endregion dpad_r - rotate turret R
+
+        if(gamepad2.left_bumper && !leftPressed){
+            leftPressed = true;
+            task.setTrackingState(TRACKINGSTATE.TRACK);
+        }
+        if(!gamepad2.left_bumper && leftPressed){
+            leftPressed = false;
+            task.setTrackingState(TRACKINGSTATE.STOP);
+        }
 
     }
 

@@ -27,7 +27,7 @@ public class TurretTest extends LinearOpMode {
     public static boolean USE_PIXEL = false;
     public static double delay = 1;
     public static double feeding_power = -1;
-    public static double position = 0.6;
+    public static double position = 0.59;
     int targetVeocity;
     int unit = 100;
     DcMotorEx outtakeMotor;
@@ -56,7 +56,7 @@ public class TurretTest extends LinearOpMode {
             feedTimer = new ElapsedTime();
             feedTimer.reset();
             intake = hardwareMap.dcMotor.get("IntakeDc");
-            blocker.setPosition(0.43);
+            blocker.setPosition(0.47);
             while (opModeIsActive()) {
                 // OpMode loop
                 coefficients = new PIDFCoefficients(kP,kI,kD,kF*(12/hardwareMap.voltageSensor.iterator().next().getVoltage()));
@@ -91,7 +91,7 @@ public class TurretTest extends LinearOpMode {
                     outtakeResting = true;
                     outtakeMotor.setPower(0);
                     intake.setPower(0);
-                    blocker.setPosition(0.43);
+                    blocker.setPosition(0.47);
                     outtakeTimer.reset();
                 }
                 if(outtakeResting){

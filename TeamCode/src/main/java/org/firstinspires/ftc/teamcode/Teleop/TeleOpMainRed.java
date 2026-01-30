@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.hardware.TaskLogics;
 import org.firstinspires.ftc.teamcode.movement.IMUDriving;
 import org.firstinspires.ftc.teamcode.utils.PanelsHelper;
 
-@TeleOp(name = "TeleOp Blue",group = "TeleOp")
+@TeleOp(name = "TeleOp Red",group = "TeleOp")
 public class TeleOpMainRed extends OpMode {
     Robot robot;
     IMUDriving imuDriving;
@@ -23,7 +23,7 @@ public class TeleOpMainRed extends OpMode {
     boolean leftBumperWasPressed = false;
     boolean rightDpadWasPressed = false;
     boolean leftDpadWasPressed = false;
-
+    boolean leftPressed = false;
 
 
     @Override
@@ -61,11 +61,11 @@ public class TeleOpMainRed extends OpMode {
         if(gamepad2.bWasPressed()){
             task.setBlockState(BLOCKSTATE.OPEN);
             task.setOuttakeState(OUTTAKESTATE.SHOOT);
-            task.setTrackingState(TRACKINGSTATE.TRACK);
+//            task.setTrackingState(TRACKINGSTATE.TRACK);
         }
         if(gamepad2.bWasReleased()){
             task.setOuttakeState(OUTTAKESTATE.REST);
-            task.setTrackingState(TRACKINGSTATE.RESET);
+//            task.setTrackingState(TRACKINGSTATE.RESET);
 //            task.setBlockState(BLOCKSTATE.BLOCK);
         }
         //endregion b - shoot
@@ -102,7 +102,14 @@ public class TeleOpMainRed extends OpMode {
             task.setTrackingState(TRACKINGSTATE.STOP);
         }
         //endregion dpad_r - rotate turret R
-
+        if(gamepad2.left_bumper && !leftPressed){
+            leftPressed = true;
+            task.setTrackingState(TRACKINGSTATE.TRACK);
+        }
+        if(!gamepad2.left_bumper && leftPressed){
+            leftPressed = false;
+            task.setTrackingState(TRACKINGSTATE.STOP);
+        }
     }
 
 

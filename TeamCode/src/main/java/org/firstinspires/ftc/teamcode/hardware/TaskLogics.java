@@ -49,7 +49,7 @@ public class TaskLogics {
     PIDFCoefficients outtakePIDF_far = new PIDFCoefficients(450,0,0,15);
 
     double farF = 15;
-    public double feedDelay = 1.5;
+    public double feedDelay = 2;
 
 //endregion outtake
 
@@ -189,18 +189,22 @@ public class TaskLogics {
 //methods
 //region manager
     public void setIntakeState(INTAKESTATE state){
+        if (this.intakeState == state) return;
         this.intakeState = state;
         this.timers.get(STATES.INTAKE).reset();
     }
     public void setOuttakeState(OUTTAKESTATE state){
+        if (this.outtakeState == state) return;
         this.outtakeState = state;
         this.timers.get(STATES.OUTTAKE).reset();
     }
     public void setTrackingState(TRACKINGSTATE state){
+        if (this.trackingState == state) return;
         this.trackingState = state;
         this.timers.get(STATES.TRACKING).reset();
     }
     public void setBlockState(BLOCKSTATE state){
+        if (this.blockState == state) return;
         this.blockState = state;
         this.timers.get(STATES.BLOCK).reset();
     }
