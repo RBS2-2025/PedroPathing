@@ -49,7 +49,7 @@ public class TaskLogics {
     PIDFCoefficients outtakePIDF_far = new PIDFCoefficients(450,0,0,15);
 
     double farF = 15;
-    public double feedDelay = 2;
+    public double feedDelay = 1.5;
 
 //endregion outtake
 
@@ -58,8 +58,9 @@ public class TaskLogics {
 //endregion tracker
 
 //region block
-    double OPEN_POSITION = 0.6;
-    double BLOCK_POSITION = 0.43;
+    double OPEN_POSITION = 0.616;
+    double BLOCK_POSITION = 0.47;
+    double PUSH_POSITION = 0.59;
 //endregion block
 
 //region panels
@@ -170,6 +171,9 @@ public class TaskLogics {
                 break;
             case OPEN:
                 open_block();
+                break;
+            case PUSH:
+                push_block();
                 break;
         }
         if(panel != null){
@@ -319,6 +323,10 @@ public class TaskLogics {
     }
     void open_block() {
         this.blocker.setPosition(OPEN_POSITION);
+        this.setBlockState(BLOCKSTATE.IDLE);
+    }
+    void push_block(){
+        this.blocker.setPosition(PUSH_POSITION);
         this.setBlockState(BLOCKSTATE.IDLE);
     }
 //endregion block

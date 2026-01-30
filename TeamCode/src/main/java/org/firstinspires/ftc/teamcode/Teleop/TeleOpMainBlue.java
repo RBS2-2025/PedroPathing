@@ -78,13 +78,9 @@ public class TeleOpMainBlue extends OpMode {
         }
         //endregion x - discharge
         //region y - change PIDF and velocity
-        if(gamepad2.yWasPressed()){
-//            task.setOuttakeState(OUTTAKESTATE.TOGGLE_POSITION);
-            task.setTrackingState(TRACKINGSTATE.TRACK);
-        }
-        if (gamepad2.yWasReleased()){
-            task.setTrackingState(TRACKINGSTATE.RESET);
-        }
+//        if(gamepad2.yWasPressed()){
+//            task.setBlockState(BLOCKSTATE.BLOCK);
+//        }
         //endregion y - change PIDF and velocity
         //region dpad_l - rotate turret L
         if(gamepad2.dpad_left && !leftDpadWasPressed){

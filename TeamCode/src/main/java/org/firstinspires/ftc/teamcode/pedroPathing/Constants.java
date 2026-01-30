@@ -19,7 +19,12 @@ public class Constants {
     public static FollowerConstants followerConstants =
             new FollowerConstants()
                     .mass(12)
-                    ;
+                    .forwardZeroPowerAcceleration(-49.50446886690082)
+                    .lateralZeroPowerAcceleration(-69.90031212826034)
+                    .translationalPIDFCoefficients(new PIDFCoefficients(0.1,0,0.001,0.05))
+                    .headingPIDFCoefficients(new PIDFCoefficients(1,0,0.001,0.02))
+                    .drivePIDFCoefficients(new FilteredPIDFCoefficients(0.02,0,0.000005,0.6,0.01))
+                    .centripetalScaling(0.0012);
 
     public static PathConstraints pathConstraints = new PathConstraints(0.99, 100, 2.5, 1);
 
@@ -33,7 +38,8 @@ public class Constants {
             .leftRearMotorDirection(DcMotorSimple.Direction.FORWARD)
             .rightFrontMotorDirection(DcMotorSimple.Direction.REVERSE)
             .rightRearMotorDirection(DcMotorSimple.Direction.REVERSE)
-            ;
+            .xVelocity(55.475917065237454)
+            .yVelocity(43.25214151697835);
 
 
 

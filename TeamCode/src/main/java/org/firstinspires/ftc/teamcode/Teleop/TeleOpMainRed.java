@@ -12,7 +12,7 @@ import org.firstinspires.ftc.teamcode.hardware.TaskLogics;
 import org.firstinspires.ftc.teamcode.movement.IMUDriving;
 import org.firstinspires.ftc.teamcode.utils.PanelsHelper;
 
-@TeleOp(name = "TeleOp Red",group = "TeleOp")
+@TeleOp(name = "TeleOp Blue",group = "TeleOp")
 public class TeleOpMainRed extends OpMode {
     Robot robot;
     IMUDriving imuDriving;
@@ -33,6 +33,7 @@ public class TeleOpMainRed extends OpMode {
         this.imuDriving = new IMUDriving(hardwareMap,panel,gamepad1);
         this.task = new TaskLogics(this.robot,false);
         this.task.panel = this.panel;
+        this.imuDriving.speed=0.7;
     }
 
     @Override
@@ -65,7 +66,7 @@ public class TeleOpMainRed extends OpMode {
         if(gamepad2.bWasReleased()){
             task.setOuttakeState(OUTTAKESTATE.REST);
             task.setTrackingState(TRACKINGSTATE.RESET);
-            task.setBlockState(BLOCKSTATE.BLOCK);
+//            task.setBlockState(BLOCKSTATE.BLOCK);
         }
         //endregion b - shoot
         //region x - discharge
@@ -78,7 +79,7 @@ public class TeleOpMainRed extends OpMode {
         //endregion x - discharge
         //region y - change PIDF and velocity
         if(gamepad2.yWasPressed()){
-            task.setOuttakeState(OUTTAKESTATE.TOGGLE_POSITION);
+            task.setBlockState(BLOCKSTATE.BLOCK);
         }
         //endregion y - change PIDF and velocity
         //region dpad_l - rotate turret L
