@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.firstinspires.ftc.teamcode.Vision.TurretControl;
+import org.firstinspires.ftc.teamcode.Vision.TurretControlOld;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.utils.PanelsHelper;
 
@@ -21,13 +21,13 @@ public class TrackingTest extends OpMode {
     public static double d_zone = 0;
     Robot robot;
     DcMotorEx tracker;
-    TurretControl control;
+    TurretControlOld control;
     PanelsHelper panel;
     @Override
     public void init() {
         robot = new Robot(hardwareMap,true);
         this.tracker = this.robot.tracker;
-        this.control = new TurretControl(robot,true,robot.imu);
+        this.control = new TurretControlOld(robot,true,robot.imu);
         panel = new PanelsHelper(this);
         tracker.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         tracker.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

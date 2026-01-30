@@ -11,7 +11,7 @@ import com.bylazar.telemetry.PanelsTelemetry;
 import org.firstinspires.ftc.teamcode.enums.INTAKESTATE;
 import org.firstinspires.ftc.teamcode.enums.OUTTAKESTATE;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
-import org.firstinspires.ftc.teamcode.hardware.TaskLogics;
+import org.firstinspires.ftc.teamcode.hardware.TaskLogicsOld;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
@@ -28,7 +28,7 @@ public class Auto extends OpMode {
     private Paths paths; // Paths defined in the Paths class
     private Timer pathTimer;
     Robot robot;
-    TaskLogics task;
+    TaskLogicsOld task;
 
     //골대 시작 각도: -36도(블루)
 
@@ -45,7 +45,7 @@ public class Auto extends OpMode {
         pathTimer.resetTimer();
 
         this.robot = new Robot(hardwareMap,true);
-        this.task = new TaskLogics(this.robot,true);
+        this.task = new TaskLogicsOld(this.robot,true);
         this.task.start();
         panelsTelemetry.debug("Status", "Initialized");
         panelsTelemetry.update(telemetry);

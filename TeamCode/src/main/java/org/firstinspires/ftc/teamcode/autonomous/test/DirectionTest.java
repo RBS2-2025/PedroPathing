@@ -5,18 +5,14 @@ import com.bylazar.configurables.annotations.Configurable;
 import com.bylazar.telemetry.PanelsTelemetry;
 import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierCurve;
-import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
-import org.firstinspires.ftc.teamcode.enums.INTAKESTATE;
-import org.firstinspires.ftc.teamcode.enums.OUTTAKESTATE;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
-import org.firstinspires.ftc.teamcode.hardware.TaskLogics;
+import org.firstinspires.ftc.teamcode.hardware.TaskLogicsOld;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 @Autonomous(name = "Direction Test", group = "Autonomous")
@@ -27,7 +23,7 @@ public class DirectionTest extends OpMode {
     private int pathState = 0; // Current autonomous path state (state machine)
     private Timer pathTimer;
     Robot robot;
-    TaskLogics task;
+    TaskLogicsOld task;
     double angle;
     double x,y = 0;
 

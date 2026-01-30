@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.Teleop;
 
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -10,6 +12,7 @@ import org.firstinspires.ftc.teamcode.enums.TRACKINGSTATE;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.hardware.TaskLogics;
 import org.firstinspires.ftc.teamcode.movement.IMUDriving;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.utils.PanelsHelper;
 
 @TeleOp(name = "TeleOp Blue",group = "TeleOp")
@@ -18,6 +21,8 @@ public class TeleOpMainBlue extends OpMode {
     IMUDriving imuDriving;
     PanelsHelper panel;
     TaskLogics task;
+
+    Follower follower;
 
     boolean rightBumperWasPressed = false;
     boolean leftBumperWasPressed = false;
@@ -28,10 +33,18 @@ public class TeleOpMainBlue extends OpMode {
 
     @Override
     public void init() {
-        this.robot = new Robot(hardwareMap,true);
+        this.follower = Constants.createFollower(hardwareMap);
+        /*
+        !!!! WARNING START: need tuning !!!!
+        !!!! 오토에서 끝난 위치를 넣어야 됨    !!!!
+         */
+        this.follower.setStartingPose(new Pose(48, 96, 180));
+        // !!!! WARNING END !!!!
+        this.robot = new Robot(hardwareMap, true);
+        this.task = new TaskLogics(this.robot, this.follower, true);
+
         this.panel = new PanelsHelper(this);
         this.imuDriving = new IMUDriving(hardwareMap,panel,gamepad1);
-        this.task = new TaskLogics(this.robot,true);
         this.task.panel = this.panel;
         this.imuDriving.speed=0.7;
     }
@@ -43,9 +56,17 @@ public class TeleOpMainBlue extends OpMode {
 
     @Override
     public void loop() {
+        follower.update();
+
         imuDriving.controlWithPad(IMUDriving.GamepadPurpose.WHOLE);
         this.task.loop();
         this.inputManage();
+
+        // 텔레메트리에 값 찍어보려고 꺼내둠
+        telemetry.addData("X", follower.getPose().getX());
+        telemetry.addData("Y", follower.getPose().getY());
+        telemetry.addData("Heading", Math.toDegrees(follower.getPose().getHeading()));
+        telemetry.update();
     }
 
     void inputManage(){

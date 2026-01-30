@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.hardware.Robot;
-import org.firstinspires.ftc.teamcode.hardware.TaskLogics;
+import org.firstinspires.ftc.teamcode.hardware.TaskLogicsOld;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 @Autonomous(name = "Blue Parking Only", group = "Autonomous")
@@ -25,7 +25,7 @@ public class AutoOnlyParkingBlue extends OpMode {
     private Paths paths; // Paths defined in the Paths class
     private Timer pathTimer;
     Robot robot;
-    TaskLogics task;
+    TaskLogicsOld task;
 
     //골대 시작 각도: -36도(블루)
 
@@ -42,7 +42,7 @@ public class AutoOnlyParkingBlue extends OpMode {
         pathTimer.resetTimer();
 
         this.robot = new Robot(hardwareMap,true);
-        this.task = new TaskLogics(this.robot,false);
+        this.task = new TaskLogicsOld(this.robot,false);
         this.task.start();
         panelsTelemetry.debug("Status", "Initialized");
         panelsTelemetry.update(telemetry);

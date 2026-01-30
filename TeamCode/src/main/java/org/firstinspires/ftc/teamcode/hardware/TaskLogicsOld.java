@@ -1,13 +1,12 @@
 package org.firstinspires.ftc.teamcode.hardware;
 
-import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Vision.TurretControl;
+import org.firstinspires.ftc.teamcode.Vision.TurretControlOld;
 import org.firstinspires.ftc.teamcode.enums.BLOCKSTATE;
 import org.firstinspires.ftc.teamcode.enums.INTAKESTATE;
 import org.firstinspires.ftc.teamcode.enums.OUTTAKEPOSITION;
@@ -22,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 //TODO OUTTAKE -  PIDF, VELOCITY 넣기
 //TODO BLOCK - open, block position 넣기
-public class TaskLogics {
+public class TaskLogicsOld {
 //vars
 //region hardware
     DcMotorEx intaker, shooter, tracker;
@@ -55,7 +54,7 @@ public class TaskLogics {
 //endregion outtake
 
 //region tracker
-    TurretControl turretControl;
+    TurretControlOld turretControl;
 //endregion tracker
 
 //region block
@@ -70,18 +69,15 @@ public class TaskLogics {
 
     Map<STATES,ElapsedTime> timers = new EnumMap<>(STATES.class);
 
-    // Follower 필드 추가
-    Follower follower;
 
-    public TaskLogics(Robot robot, Follower follower, boolean isBlue){
+    public TaskLogicsOld(Robot robot, boolean isBlue){
         this.robot = robot;
-        this.follower = follower;
         this.intaker = robot.intaker;
         this.shooter = robot.shooter;
         this.shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,this.outtakePIDF_near);
         this.blocker = robot.blocker;
         this.tracker = robot.tracker;
-        this.turretControl = new TurretControl(robot, follower, isBlue);
+        this.turretControl = new TurretControlOld(robot, isBlue,robot.imu);
         for (STATES state : STATES.values()) {
             timers.put(state, new ElapsedTime());
         }
@@ -295,7 +291,9 @@ public class TaskLogics {
 //endregion outtake
 
 //region track
-    void track() {turretControl.update();}
+    void track(){
+        turretControl.align(0.35,false,0.02);
+    }
     void track_reset(){
         tracker.setPower(0);
         tracker.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

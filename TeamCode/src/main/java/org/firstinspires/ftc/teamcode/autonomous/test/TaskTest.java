@@ -1,9 +1,7 @@
 package org.firstinspires.ftc.teamcode.autonomous.test;
 
 import com.bylazar.configurables.annotations.Configurable;
-import com.bylazar.telemetry.TelemetryManager;
 import com.pedropathing.follower.Follower;
-import com.pedropathing.geometry.BezierCurve;
 import com.pedropathing.geometry.BezierLine;
 import com.pedropathing.geometry.Pose;
 import com.pedropathing.paths.PathChain;
@@ -15,7 +13,7 @@ import org.firstinspires.ftc.teamcode.enums.INTAKESTATE;
 import org.firstinspires.ftc.teamcode.enums.OUTTAKESTATE;
 import org.firstinspires.ftc.teamcode.enums.TRACKINGSTATE;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
-import org.firstinspires.ftc.teamcode.hardware.TaskLogics;
+import org.firstinspires.ftc.teamcode.hardware.TaskLogicsOld;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 @Autonomous(name = "TaskTEST", group = "Autonomous")
@@ -27,7 +25,7 @@ public class TaskTest extends OpMode {
     private Paths paths; // Paths defined in the Paths class
     private Timer pathTimer;
     Robot robot;
-    TaskLogics task;
+    TaskLogicsOld task;
 
     //골대 시작 각도: -36도(블루)
 
@@ -43,7 +41,7 @@ public class TaskTest extends OpMode {
         pathTimer.resetTimer();
 
         robot = new Robot(hardwareMap,true);
-        task = new TaskLogics(robot,true);
+        task = new TaskLogicsOld(robot,true);
 
 //        telemetry.deb("Status", "Initialized");
         telemetry.update();

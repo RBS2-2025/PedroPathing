@@ -1,125 +1,90 @@
 package org.firstinspires.ftc.teamcode.Vision;
 
+import com.pedropathing.follower.Follower;
+import com.pedropathing.geometry.Pose;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.LLResultTypes;
-import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.IMU;
-
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
-import org.firstinspires.ftc.teamcode.utils.PanelsHelper;
-
 import java.util.List;
 
 public class TurretControl {
-    public Limelight3A limelight;
-    public DcMotorEx turretMotor;
+    private final Follower follower;
+    private final DcMotorEx turretMotor;
+    private final Robot robot;
 
-    public double tx; //x 차이
+    // !!!! WARNING START: need tuning !!!!
+    public static double TICKS_PER_DEGREE = (double) 10 /3;
+    // !!!! WARNING END: need tuning !!!!
 
-    public double cam_height = 0; // 카메라 높이 : MM
-    public double target_height = 754; // 골대 태그 높이 : MM
-    public double cam_angle = 0; // 카메라 설치 각도
-    public boolean isBlue;
-    public PanelsHelper panel;
+    // 골대 위치
+    public static final Pose BLUE_BASKET = new Pose(144, 144);
+    public static final Pose RED_BASKET = new Pose(144, 0);
+
+    private final Pose targetGoalPose;
     int targetID;
-    public double deadZone = 0.2;
-    IMU imu;
 
-    public TurretControl(Robot robot, boolean blue, IMU imu){
-//        this.limelight = hardwareMap.get(Limelight3A.class,"limelight");
-        this.limelight = robot.limelight;
+    // 라임라이트 보정용 변수
+    private double visionOffsetDeg = 0;
+    public double deadZone = 1.0;
+
+    public TurretControl(Robot robot, Follower follower, boolean isBlue){
+        this.robot = robot;
         this.turretMotor = robot.tracker;
+        this.follower = follower;
 
-        this.isBlue = blue;
-        this.targetID = this.isBlue? 20 : 24;
-//        this.targetID = 23;
-        this.imu = imu;
+        this.targetGoalPose = isBlue ? BLUE_BASKET : RED_BASKET;
+        this.targetID = isBlue? 20: 24;
 
-
-        limelight.pipelineSwitch(0); // 0번 파이프라인 (예: AprilTag)
-        limelight.start();
-    }
-
-    public void stop() {
-        limelight.stop();
-    }
-
-
-    public void align(double maxPower, boolean byPixel, double speed){
-        limelight.updateRobotOrientation(imu.getRobotYawPitchRollAngles().getYaw());
-        LLResult result = limelight.getLatestResult();
-        if(!result.isValid()) {
-//            panel.addData("status","not valid");
-            if(Math.abs(turretMotor.getCurrentPosition()) < 20){
-                turretMotor.setPower(0);
-                return;
-            }
-            turretMotor.setTargetPosition(0);
-            turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            turretMotor.setPower(maxPower);
-            return;
-        }
-        List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
-        if(fiducialResults.isEmpty()) {
-            turretMotor.setPower(0);
-//            panel.addData("status","not found");
-            return;
-        }
-        for(LLResultTypes.FiducialResult fr : fiducialResults){
-            if (fr.getFiducialId() != targetID) continue;
-            turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            tx = fr.getTargetXDegrees() * speed;
-//            panel.addData("tx",tx);
-            if(Math.abs(tx) < deadZone) {
-                turretMotor.setPower(0);
-                return;
-            }
-            double power = -tx;
-
-            if(Math.abs(power) > maxPower) {
-                power = Math.signum(power) * maxPower;
-            }
-//            panel.addData("power",power);
-            if (turretMotor.getCurrentPosition() > 300) {
-                turretMotor.setPower(Math.min(0, power)); // +방향 차단
-                return;
-            }
-            if (turretMotor.getCurrentPosition() < -300) {
-                turretMotor.setPower(Math.max(0, power)); // -방향 차단
-                return;
-            }
-            turretMotor.setPower(power);
-            return;
-        }
-        if(Math.abs(turretMotor.getCurrentPosition()) < 2){
-            turretMotor.setPower(0);
-            return;
-        }
-//        panel.addData("status","skipped");
-
+        turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         turretMotor.setTargetPosition(0);
         turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        turretMotor.setPower(maxPower);
-
-        return;
+        turretMotor.setPower(1.0);
     }
 
-    public double getDistance(){
-        LLResult result = limelight.getLatestResult();
-        if (!result.isValid()) return -1;
-        List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
-        if(fiducialResults.isEmpty()) return -1;
+    public void update() {
+        Pose robotPose = follower.getPose();
 
-        for (LLResultTypes.FiducialResult fr: fiducialResults){
-            if(fr.getFiducialId() != targetID) continue;
-            double angle = Math.toRadians(cam_angle + fr.getTargetYDegrees());
-            if (Math.abs(Math.toDegrees(angle)) < 1e-3) return -1;
-            return (target_height-cam_height) / Math.tan(angle);
+        double dx = targetGoalPose.getX() - robotPose.getX();
+        double dy = targetGoalPose.getY() - robotPose.getY();
+        double angleToGoalRad = Math.atan2(dy, dx); // 아크탄젠트로 목표각도 계산
+
+        double robotHeadingRad = robotPose.getHeading(); // 로봇 현재각도 get
+        double relativeAngleRad = angleToGoalRad - robotHeadingRad; // 목표각도 - 현재각도 = 회전해야할 각도
+
+        // 각도 정규화 (회전해야할 각도는 정규화 (-pi ~ pi)되지 않았을 수 있음)
+        relativeAngleRad = normalizeAngle(relativeAngleRad);
+        double relativeAngleDeg = Math.toDegrees(relativeAngleRad);
+
+        updateVisionCorrection(); // 라임라이트 보정
+
+        double finalTargetDeg = relativeAngleDeg + visionOffsetDeg; // 최종 보정값
+
+        int targetTicks = (int) (finalTargetDeg * TICKS_PER_DEGREE); // 모터 명령부
+
+        turretMotor.setTargetPosition(targetTicks);
+    }
+
+    // 각도 정규화 함수 (어디 찾으면 내장함수로 있을 건데 못 찾아서 그냥 직접 씀)
+    private double normalizeAngle(double angleRadians) {
+        while (angleRadians > Math.PI) angleRadians -= 2 * Math.PI;
+        while (angleRadians < -Math.PI) angleRadians += 2 * Math.PI;
+        return angleRadians;
+    }
+
+    private void updateVisionCorrection() {
+        LLResult result = robot.limelight.getLatestResult();
+        if (result != null && result.isValid()) {
+            List<LLResultTypes.FiducialResult> tags = result.getFiducialResults();
+            for (LLResultTypes.FiducialResult tag : tags) {
+                // 필요하다면 여기서 태그 ID 필터링 (Blue: 20, Red: 24 등 -> 굳이?)
+                if(tag.getFiducialId() != targetID) return;
+                double tx = tag.getTargetXDegrees();
+                double power = tx * 0.02;
+                power = Math.min(3.5,Math.max(-3.5,power));
+                visionOffsetDeg += power; // 게인값 조절 (너무 빠르면 줄이기)
+            }
         }
-        return -1;
     }
 }
