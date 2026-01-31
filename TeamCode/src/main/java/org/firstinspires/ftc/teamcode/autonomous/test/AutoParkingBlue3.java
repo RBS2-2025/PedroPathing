@@ -17,11 +17,12 @@ import org.firstinspires.ftc.teamcode.enums.BLOCKSTATE;
 import org.firstinspires.ftc.teamcode.enums.INTAKESTATE;
 import org.firstinspires.ftc.teamcode.enums.OUTTAKESTATE;
 import org.firstinspires.ftc.teamcode.enums.STATES;
+import org.firstinspires.ftc.teamcode.enums.TRACKINGSTATE;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
 import org.firstinspires.ftc.teamcode.hardware.TaskLogicsOld;
 import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
-@Autonomous(name = "Blue Parking 6", group = "Autonomous")
+@Autonomous(name = "Blue Auto Main", group = "Autonomous")
 @Configurable // Panels
 public class AutoParkingBlue3 extends OpMode {
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
@@ -90,10 +91,10 @@ public class AutoParkingBlue3 extends OpMode {
             StartOuttake = follower.pathBuilder().addPath(
                             new BezierCurve(
                                     new Pose(25.000, 129.000),
-                                    new Pose(37.500, 111.500),
-                                    new Pose(48.000, 96.000)
+                                    new Pose(32.250, 113.500),
+                                    new Pose(37.500, 104.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(144), Math.toRadians(135))
+                    ).setLinearHeadingInterpolation(Math.toRadians(144), Math.toRadians(123))
 
                     .build();
 
@@ -111,7 +112,7 @@ public class AutoParkingBlue3 extends OpMode {
                             new BezierLine(
                                     new Pose(48.000, 60.000),
 
-                                    new Pose(18.000, 60.000)
+                                    new Pose(15.000, 60.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(180), Math.toRadians(180))
 
@@ -170,11 +171,14 @@ public class AutoParkingBlue3 extends OpMode {
                     task.setOuttakeState(OUTTAKESTATE.SHOOT);
                     if(task.getTime(STATES.OUTTAKE) > 2){
                         task.setBlockState(BLOCKSTATE.OPEN);
+                        task.setTrackingState(TRACKINGSTATE.TRACK);
                         delay(0.1);
                     }
                     if(task.getTime(STATES.OUTTAKE) > 5){
                         task.setOuttakeState(OUTTAKESTATE.REST);
                         task.setBlockState(BLOCKSTATE.BLOCK);
+                        task.setTrackingState(TRACKINGSTATE.RESET);
+                        task.setIntakeState(INTAKESTATE.STOP);
                         delay(0.1);
                         setPathState(2);
                     }
@@ -182,13 +186,14 @@ public class AutoParkingBlue3 extends OpMode {
                 break;
             case 2:
                 if(!follower.isBusy()){
+                    task.setIntakeState(INTAKESTATE.INTAKE);
                     followPath(paths.Intake,1,true);
-                    task.setIntakeState(INTAKESTATE.FEED);
                     setPathState(3);
                 }
                 break;
             case 3:
                 if(!follower.isBusy()){
+                    task.setIntakeState(INTAKESTATE.INTAKE);
                     followPath(paths.IntakeEnd,0.4,true);
                     setPathState(4);
                 }
@@ -205,11 +210,13 @@ public class AutoParkingBlue3 extends OpMode {
                     task.setOuttakeState(OUTTAKESTATE.SHOOT);
                     if(task.getTime(STATES.OUTTAKE) > 2){
                         task.setBlockState(BLOCKSTATE.OPEN);
+                        task.setTrackingState(TRACKINGSTATE.TRACK);
                         delay(0.1);
                     }
                     if(task.getTime(STATES.OUTTAKE) > 5){
                         task.setOuttakeState(OUTTAKESTATE.REST);
                         task.setBlockState(BLOCKSTATE.BLOCK);
+                        task.setTrackingState(TRACKINGSTATE.RESET);
                         delay(0.1);
                         setPathState(6);
                     }

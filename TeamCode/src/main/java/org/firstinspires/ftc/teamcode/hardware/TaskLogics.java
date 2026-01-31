@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Vision.TurretControl;
+import org.firstinspires.ftc.teamcode.Vision.TurretControlOld;
 import org.firstinspires.ftc.teamcode.enums.BLOCKSTATE;
 import org.firstinspires.ftc.teamcode.enums.INTAKESTATE;
 import org.firstinspires.ftc.teamcode.enums.OUTTAKEPOSITION;
@@ -55,7 +56,7 @@ public class TaskLogics {
 //endregion outtake
 
 //region tracker
-    TurretControl turretControl;
+    TurretControlOld turretControl;
 //endregion tracker
 
 //region block
@@ -81,7 +82,7 @@ public class TaskLogics {
         this.shooter.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER,this.outtakePIDF_near);
         this.blocker = robot.blocker;
         this.tracker = robot.tracker;
-        this.turretControl = new TurretControl(robot, follower, isBlue);
+        this.turretControl = new TurretControlOld(robot, isBlue,robot.imu);
         for (STATES state : STATES.values()) {
             timers.put(state, new ElapsedTime());
         }
@@ -90,7 +91,6 @@ public class TaskLogics {
         this.setIntakeState(INTAKESTATE.STOP);
         this.setOuttakeState(OUTTAKESTATE.PREHEAT);
         this.setTrackingState(TRACKINGSTATE.RESET);
-        this.setBlockState(BLOCKSTATE.BLOCK);
         changeOuttakePosition(OUTTAKEPOSITION.NEAR);
         this.shooter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         this.tracker.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -295,7 +295,7 @@ public class TaskLogics {
 //endregion outtake
 
 //region track
-    void track() {turretControl.update();}
+    void track() {turretControl.align(3.5,false,0.02);}
     void track_reset(){
         tracker.setPower(0);
         tracker.setMode(DcMotor.RunMode.RUN_USING_ENCODER);

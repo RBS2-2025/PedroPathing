@@ -1,14 +1,17 @@
 package org.firstinspires.ftc.teamcode.TEST;
 
 import com.bylazar.configurables.annotations.Configurable;
+import com.pedropathing.follower.Follower;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+import org.firstinspires.ftc.teamcode.Vision.TurretControl;
 import org.firstinspires.ftc.teamcode.Vision.TurretControlOld;
 import org.firstinspires.ftc.teamcode.hardware.Robot;
+import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 import org.firstinspires.ftc.teamcode.utils.PanelsHelper;
 
 @Configurable
@@ -21,13 +24,15 @@ public class TrackingTest extends OpMode {
     public static double d_zone = 0;
     Robot robot;
     DcMotorEx tracker;
-    TurretControlOld control;
+    TurretControl control;
     PanelsHelper panel;
+    Follower follower;
     @Override
     public void init() {
+        this.follower = Constants.createFollower(hardwareMap);
         robot = new Robot(hardwareMap,true);
         this.tracker = this.robot.tracker;
-        this.control = new TurretControlOld(robot,true,robot.imu);
+        this.control = new TurretControl(robot,follower,true);
         panel = new PanelsHelper(this);
         tracker.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         tracker.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -37,7 +42,7 @@ public class TrackingTest extends OpMode {
         else{
             tracker.setDirection(DcMotorSimple.Direction.FORWARD);
         }
-        control.panel = new PanelsHelper(this);
+
         control.deadZone = d_zone;
     }
 
@@ -46,11 +51,6 @@ public class TrackingTest extends OpMode {
         if(gamepad1.yWasPressed()){
             tracker.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             tracker.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        }
-        if(gamepad1.bWasPressed() && !tracker.isBusy()){
-            tracker.setTargetPosition(0);
-            tracker.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            tracker.setPower(max_speed);
         }
         if(gamepad1.dpad_left){
             tracker.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -68,7 +68,7 @@ public class TrackingTest extends OpMode {
             tracker.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
         if(gamepad1.a){
-            control.align(max_speed,false,speed);
+            control.update();
         }
         panel.addData("position: ", tracker.getCurrentPosition());
         panel.update();

@@ -17,17 +17,17 @@ public class TurretControl {
     // !!!! WARNING START: need tuning !!!!
     public static double TICKS_PER_DEGREE = (double) 10 /3;
     // !!!! WARNING END: need tuning !!!!
-
+    double MAX_ROTATION_DEG = 90;
     // 골대 위치
-    public static final Pose BLUE_BASKET = new Pose(144, 144);
-    public static final Pose RED_BASKET = new Pose(144, 0);
+    public static final Pose BLUE_BASKET = new Pose(0, 144);
+    public static final Pose RED_BASKET = new Pose(144, 144);
 
     private final Pose targetGoalPose;
     int targetID;
 
     // 라임라이트 보정용 변수
     private double visionOffsetDeg = 0;
-    public double deadZone = 1.0;
+    public double deadZone = 5;
 
     public TurretControl(Robot robot, Follower follower, boolean isBlue){
         this.robot = robot;
@@ -38,9 +38,6 @@ public class TurretControl {
         this.targetID = isBlue? 20: 24;
 
         turretMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        turretMotor.setTargetPosition(0);
-        turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        turretMotor.setPower(1.0);
     }
 
     public void update() {
@@ -59,20 +56,25 @@ public class TurretControl {
 
         updateVisionCorrection(); // 라임라이트 보정
 
+
+
         double finalTargetDeg = relativeAngleDeg + visionOffsetDeg; // 최종 보정값
+
+        if(Math.abs(finalTargetDeg) > MAX_ROTATION_DEG){
+            finalTargetDeg = 0;
+            visionOffsetDeg = 0;
+        }
+        if(Math.abs(relativeAngleDeg) < deadZone){
+            turretMotor.setPower(0);
+            return;
+        }
 
         int targetTicks = (int) (finalTargetDeg * TICKS_PER_DEGREE); // 모터 명령부
 
-        //regulation
-        if (turretMotor.getCurrentPosition() > 300) {
-            turretMotor.setPower(Math.min(0, targetTicks)); // +방향 차단
-            return;
-        }
-        if (turretMotor.getCurrentPosition() < -300) {
-            turretMotor.setPower(Math.max(0, targetTicks)); // -방향 차단
-            return;
-        }
+        turretMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         turretMotor.setTargetPosition(targetTicks);
+        turretMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        turretMotor.setPower(0.3 * (Math.max(relativeAngleDeg/90,0.06)));
     }
 
     // 각도 정규화 함수 (어디 찾으면 내장함수로 있을 건데 못 찾아서 그냥 직접 씀)
