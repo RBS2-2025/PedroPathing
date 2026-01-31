@@ -38,7 +38,7 @@ public class TeleOpMainRed extends OpMode {
         !!!! WARNING START: need tuning !!!!
         !!!! 오토에서 끝난 위치를 넣어야 됨    !!!!
          */
-        this.follower.setStartingPose(new Pose(96, 96, 180));
+        this.follower.setStartingPose(new Pose(48, 96, 180));
         // !!!! WARNING END !!!!
         this.robot = new Robot(hardwareMap, true);
         this.task = new TaskLogics(this.robot, this.follower, false);

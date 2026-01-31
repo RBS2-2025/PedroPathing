@@ -43,7 +43,7 @@ public class TrackingTest extends OpMode {
             tracker.setDirection(DcMotorSimple.Direction.FORWARD);
         }
 
-        control.deadZone = d_zone;
+        control.visionDeadZone = d_zone;
     }
 
     @Override
@@ -71,6 +71,7 @@ public class TrackingTest extends OpMode {
             control.update();
         }
         panel.addData("position: ", tracker.getCurrentPosition());
+        control.getDebug(panel);
         panel.update();
 
     }

@@ -24,7 +24,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.Constants;
 
 @Autonomous(name = "Red Auto Main", group = "Autonomous")
 @Configurable // Panels
-public class AutoParkingRed3 extends OpMode {
+public class AutoParkingRed9 extends OpMode {
     private TelemetryManager panelsTelemetry; // Panels Telemetry instance
     public Follower follower; // Pedro Pathing follower instance
     private int pathState = 0; // Current autonomous path state (state machine)
@@ -80,21 +80,25 @@ public class AutoParkingRed3 extends OpMode {
 
 
 
+
     public static class Paths {
-        public PathChain StartOuttake;
+        public PathChain OuttakeStart;
         public PathChain Intake;
         public PathChain IntakeEnd;
         public PathChain Outtake2;
+        public PathChain IntakeTop;
+        public PathChain IntakeTopEnd;
+        public PathChain Outtake3;
         public PathChain Parking;
 
         public Paths(Follower follower) {
-            StartOuttake = follower.pathBuilder().addPath(
+            OuttakeStart = follower.pathBuilder().addPath(
                             new BezierCurve(
                                     new Pose(118.000, 130.000),
                                     new Pose(111.750, 113.500),
                                     new Pose(106.500, 104.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(37), Math.toRadians(33))
+                    ).setLinearHeadingInterpolation(Math.toRadians(37), Math.toRadians(45))
 
                     .build();
 
@@ -104,7 +108,7 @@ public class AutoParkingRed3 extends OpMode {
                                     new Pose(83.270, 79.791),
                                     new Pose(96.000, 60.000)
                             )
-                    ).setLinearHeadingInterpolation(Math.toRadians(33), Math.toRadians(0))
+                    ).setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(0))
 
                     .build();
 
@@ -128,11 +132,41 @@ public class AutoParkingRed3 extends OpMode {
 
                     .build();
 
+            IntakeTop = follower.pathBuilder().addPath(
+                            new BezierLine(
+                                    new Pose(96.000, 96.000),
+
+                                    new Pose(96.000, 84.000)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(0))
+
+                    .build();
+
+            IntakeTopEnd = follower.pathBuilder().addPath(
+                            new BezierLine(
+                                    new Pose(96.000, 84.000),
+
+                                    new Pose(129.000, 84.000)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(0))
+
+                    .build();
+
+            Outtake3 = follower.pathBuilder().addPath(
+                            new BezierCurve(
+                                    new Pose(129.000, 84.000),
+                                    new Pose(97.105, 80.666),
+                                    new Pose(96.000, 96.000)
+                            )
+                    ).setLinearHeadingInterpolation(Math.toRadians(0), Math.toRadians(45))
+
+                    .build();
+
             Parking = follower.pathBuilder().addPath(
                             new BezierLine(
                                     new Pose(96.000, 96.000),
 
-                                    new Pose(96.000, 60.000)
+                                    new Pose(96.000, 69.000)
                             )
                     ).setLinearHeadingInterpolation(Math.toRadians(45), Math.toRadians(0))
 
@@ -148,13 +182,14 @@ public class AutoParkingRed3 extends OpMode {
 
 
 
+
 //#endregion paths
 
     public void autonomousPathUpdate() {
         switch (pathState){
             case 0:
                 delay(0.5);
-                followPath(paths.StartOuttake,1,true);
+                followPath(paths.OuttakeStart,1,true);
                 setPathState(1);
                 break;
             case 1:
@@ -214,6 +249,44 @@ public class AutoParkingRed3 extends OpMode {
                 }
                 break;
             case 6:
+                if(!follower.isBusy()){
+                    task.setIntakeState(INTAKESTATE.INTAKE);
+                    followPath(paths.IntakeTop,1,true);
+                    setPathState(7);
+                }
+                break;
+            case 7:
+                if(!follower.isBusy()){
+                    task.setIntakeState(INTAKESTATE.INTAKE);
+                    followPath(paths.IntakeTopEnd,0.4,true);
+                    setPathState(8);
+                }
+                break;
+            case 8:
+                if(!follower.isBusy()){
+                    task.setIntakeState(INTAKESTATE.STOP);
+                    followPath(paths.Outtake3,1,true);
+                    setPathState(9);
+                }
+                break;
+            case 9:
+                if(!follower.isBusy()) {
+                    task.setOuttakeState(OUTTAKESTATE.SHOOT);
+                    if(task.getTime(STATES.OUTTAKE) > 2){
+                        task.setBlockState(BLOCKSTATE.OPEN);
+                        task.setTrackingState(TRACKINGSTATE.TRACK);
+                        delay(0.1);
+                    }
+                    if(task.getTime(STATES.OUTTAKE) > 5){
+                        task.setOuttakeState(OUTTAKESTATE.REST);
+                        task.setBlockState(BLOCKSTATE.BLOCK);
+                        task.setTrackingState(TRACKINGSTATE.RESET);
+                        delay(0.1);
+                        setPathState(10);
+                    }
+                }
+                break;
+            case 10:
                 if(!follower.isBusy()){
                     followPath(paths.Parking,1,true);
                     setPathState(-1);
